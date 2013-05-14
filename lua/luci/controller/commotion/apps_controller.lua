@@ -524,7 +524,7 @@ ${app_types}
 		
 	else  -- if (tonumber(values.ttl) > 0)
 		-- delete service file
-		if (luci.fs.isfile("/etc/avahi/services/" .. luci.http.formvalue("uuid") .. ".service") and edit_app) then
+		if (luci.http.formvalue("uuid") and luci.http.formvalue("uuid") ~= '' and luci.fs.isfile("/etc/avahi/services/" .. luci.http.formvalue("uuid") .. ".service") and edit_app) then
 			local ret = luci.sys.exec("rm /etc/avahi/services/" .. luci.http.formvalue("uuid") .. ".service; echo $?")
 			if (ret:sub(-2,-2) ~= '0') then
 				DIE("Error removing Avahi service file")
