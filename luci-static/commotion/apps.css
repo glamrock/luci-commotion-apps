@@ -57,8 +57,6 @@ text-align:right;
 
 .signature, .colorprint { font-family: "Courier New"; font-weight:bold; font-size: 14px; }
 
-input, textarea, select, .uneditable-input { width: 500px; }
-
 button.approve { background: url("check.png") no-repeat left center; }
 button.blacklist {background: url("x.png") no-repeat left center; }
 a.edit {background: url("equals.png") no-repeat left center; padding:10px 0 10px 40px;}
