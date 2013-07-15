@@ -1,8 +1,15 @@
+<%- 
+  local prints = {}
+  for color in this_app.fingerprint:gmatch(".....?.?") do
+    table.insert(prints, color)
+  end 
+-%>
 <div class="app <%=this_app.uuid%> <%=approved%>">
+  <div class="app-inner">
 	<img src="<% if not this_app.icon:match("^[a-z]+://") then %>http://<% end %><%=this_app.icon%>"  align="Left" width="85" height="85">
 	<div class="name">
 	<h4><a href="<% if not this_app.ipaddr:match("^[a-z]+://") then %>http://<% end %><%=this_app.ipaddr%><% if this_app.port and (not this_app.ipaddr:match("[:/]") or (this_app.ipaddr:match("^[a-z]+://") and not this_app.ipaddr:match("^[a-z]+://[^/:]*[/:]"))) then %>:<%=this_app.port%><% end %>"><%=this_app.name%></a></h4>
-	<div class="app-info">
+	<!--<div class="app-info">
 	  <img class="info-button" src="<%=media%>/help.png" />
 	  <div class="app-tooltip">
 	    <div class="hashtag"><h3><%=this_app.hashtag%></h3></div>
@@ -10,19 +17,48 @@
 	    <div class="app_id"><h4>Fingerprint:</h4>
   	      <div class="signature"><%=this_app.fingerprint%></div>
 	      <div class="fingerpainting">
-  	        <%- for color in this_app.fingerprint:gmatch(".....?.?") do
-	    	    if color:len() == 4 then color = color .. "FF" end -%>
+  	        <%- for _,color in pairs(prints) do
+  	            if color:len() == 4 then color = color .. "FF" end -%>
 	    	    <span class="colorprint" style="background:#<%=color%>">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><% end %>
 	      </div>
 	    </div>
 	    <% end %>
 	  </div>
+	</div>-->
 	</div>
-	</div>
-	<p><%=this_app.description%></p>
+	<p class="description"><%=this_app.description%></p>
+	<canvas class="app-canvas app-tippable" id="canvas_<%=this_app.uuid%>" data-tip="Fingerprint: <%=table.concat(prints,' ')%>"></canvas>
+	<script type="text/javascript">
+	Zepto(function($){
+	  document.getElementById('canvas_<%=this_app.uuid%>').patternizer({
+	    stripes : [
+	      {
+		color: '#<%=prints[1]%>',
+		rotation: <%= tonumber(prints[2],16) % 360 %>,
+		opacity: <%= (tonumber(prints[3],16) % 50) + 50 %>,
+		mode: 'normal',
+		width: <%= (tonumber(prints[4],16) % 60) + 10 %>,
+		gap: <%= (tonumber(prints[5],16) % 60) + 10 %>,
+		offset: 0
+	      },
+	      {
+		color: '#<%=prints[6]%>',
+		rotation: <%= tonumber(prints[7],16) % 360 %>,
+		opacity: <%= (tonumber(prints[8],16) % 50) + 50 %>,
+		mode: 'normal',
+		width: <%= (tonumber(prints[9],16) % 60) + 10 %>,
+		gap: <%= (tonumber(prints[10],16) % 60) + 10 %>,
+		offset: 0
+	      }
+	    ],
+	    bg : '#<%=prints[11]%>FF'
+	  });
+	});
+	</script>
 	<% if (admin_vars) then %>
 	  <button class="approve" onclick="return JudgeApp('<%=this_app.uuid%>',1)">Approve</button>
 	  <button class="blacklist" onclick="return JudgeApp('<%=this_app.uuid%>',0)">Blacklist</button>
 	  <% if (this_app.localapp) then %> <a class="edit" href="apps/edit?uuid=<%=this_app.uuid%>">Edit</a><%end%>
 	<% end %>
+  </div>
 </div>

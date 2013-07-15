@@ -8,8 +8,17 @@ padding:10px;
 min-height:85px;
 }
 
+.app-inner {
+  position:relative;
+  min-height:85px;
+}
+
 .app img {
 padding-right:10px;
+}
+
+.app .name, .app .description {
+  margin-right:100px;
 }
 
 .div-bar {
@@ -76,3 +85,11 @@ text-decoration:underline;
 }
 
 fieldset legend { padding-top:0; }
+
+.app-canvas {
+  position: absolute;
+  width: 85px;
+  height: 100%;
+  top: 5px;
+  right: 5px;
+}
