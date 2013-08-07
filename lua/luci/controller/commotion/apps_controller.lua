@@ -237,7 +237,7 @@ end
 
 function action_add(edit_app)
 	
-	local UUID, values, tmpl, type_tmpl, service_type, app_types, reverse_app_types, service_string, service_file, signing_tmpl, signing_msg, resp, signature, fingerprint, deleted_uci, url
+	local UUID, values, tmpl, type_tmpl, service_type, app_types, service_string, service_file, signing_tmpl, signing_msg, resp, signature, fingerprint, deleted_uci, url
 	local uci = luci.model.uci.cursor()
 	local bad_data = {}
 	local error_info = {}
@@ -454,21 +454,26 @@ ${app_types}
 
 		-- CREATE <txt-record>type=???</txt-record> FOR EACH APPLICATION TYPE
 		app_types = ''
-		reverse_app_types = ''
+-- 		reverse_app_types = ''
 		if (type(luci.http.formvalue("type")) == "table") then
+			sorted_app_types = {}
 			for i, app_type in pairs(luci.http.formvalue("type")) do
+				table.insert(sorted_app_types, app_type)
+			end
+			table.sort(sorted_app_types)
+			for i, app_type in ipairs(sorted_app_types) do
 				app_types = app_types .. printf(type_tmpl, {app_type = app_type})
 			end
-			for i = #luci.http.formvalue("type"), 1, -1 do
-				reverse_app_types = reverse_app_types .. printf(type_tmpl, {app_type = luci.http.formvalue("type")[i]})
-			end
+-- 			for i = #luci.http.formvalue("type"), 1, -1 do
+-- 				reverse_app_types = reverse_app_types .. printf(type_tmpl, {app_type = luci.http.formvalue("type")[i]})
+-- 			end
 		else
 			if (luci.http.formvalue("type") == '' or luci.http.formvalue("type") == nil) then
 				app_types = ''
-				reverse_app_types = ''
+-- 				reverse_app_types = ''
 			else
 				app_types = printf(type_tmpl, {app_type = luci.http.formvalue("type")})
-				reverse_app_types = app_types
+-- 				reverse_app_types = app_types
 			end
 		end
 
@@ -506,7 +511,8 @@ ${app_types}
 		values.fingerprint = fields.fingerprint
 		values.signature = fields.signature
 		
-		fields.app_types = reverse_app_types -- include service types in reverse order since avahi-client parses txt-records in reverse order
+-- 		fields.app_types = reverse_app_types -- include service types in reverse order since avahi-client parses txt-records in reverse order
+		fields.app_types = app_types -- service types are in alphabetical order
 		
 		service_string = printf(tmpl,fields)
 		
