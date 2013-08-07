@@ -139,7 +139,7 @@ while read -r service; do
 	UUID="$service_uuid"
 	icon=`echo $txt |grep -o icon=[^\"]* |cut -c6- |sed -e s/"<"/"%3C"/g |sed -e s/">"/"%3E"/g |sed -e s/"[[:space:]]"/"%20"/g |sed -e s/'"'/"%22"/g`
 	description=`echo $txt |grep -o description=[^\"]* |cut -c13- |sed -e s/"\&#10;"/"$NEWLINE_PLACEHOLDER"/g |sed -e s/"\&#13;"/"\r"/g |sed -e s/"\&quot;"/'"'/g |sed -e s/"&"/"\&amp;"/g |sed -e s/"<"/"\&lt;"/g |sed -e s/">"/"\&gt;"/g |sed -e s/'"'/"\&quot;"/g |sed -e s/"$NEWLINE_PLACEHOLDER"/"\&#10;"/g |sed -e s/"\r"/"\&#13;"/g`
-	types=`echo $txt |grep -o type=[^\"]* |cut -c6- |sed 's/ /$PLACEHOLDER/g' |sed -e s/"\&#10;"/"$NEWLINE_PLACEHOLDER"/g |sed -e s/"\&#13;"/"\r"/g |sed -e s/"\&quot;"/'"'/g |sed -e s/"&"/"\&amp;"/g |sed -e s/"<"/"\&lt;"/g |sed -e s/">"/"\&gt;"/g |sed -e s/'"'/"\&quot;"/g |sed -e s/"$NEWLINE_PLACEHOLDER"/"\&#10;"/g |sed -e s/"\r"/"\&#13;"/g`
+	types=`echo $txt |grep -o type=[^\"]* |cut -c6- |sort |sed 's/ /$PLACEHOLDER/g' |sed -e s/"\&#10;"/"$NEWLINE_PLACEHOLDER"/g |sed -e s/"\&#13;"/"\r"/g |sed -e s/"\&quot;"/'"'/g |sed -e s/"&"/"\&amp;"/g |sed -e s/"<"/"\&lt;"/g |sed -e s/">"/"\&gt;"/g |sed -e s/'"'/"\&quot;"/g |sed -e s/"$NEWLINE_PLACEHOLDER"/"\&#10;"/g |sed -e s/"\r"/"\&#13;"/g`
 	expiration=`echo $txt |grep -o expiration=[^\"]* |cut -c12-`
 
 	##################### INPUT VALIDATION/SANITIZING ##########################
