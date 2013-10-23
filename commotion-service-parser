@@ -203,7 +203,7 @@ $app_types
 <txt-record>description=$description</txt-record>
 <txt-record>expiration=$expiration</txt-record>"
 
-	echo "$sig_tmpl" |SERVALINSTANCE_PATH=/etc/serval serval-verify -s $signature -i $fingerprint
+	echo "$sig_tmpl" |SERVALINSTANCE_PATH=/etc/serval serval-crypto --verify -s $signature -i $fingerprint
 	if [ $? -ne 0 ]; then
 		echo "Service failed verification"
 		echo "$sig_tmpl"
