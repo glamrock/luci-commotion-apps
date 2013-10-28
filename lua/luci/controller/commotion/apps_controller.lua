@@ -270,8 +270,8 @@ function action_add(edit_app)
 	end
 	
 	if not is_ip4addr(values.ipaddr) then 
-		local scheme = uri:new(values.ipaddr):scheme()
-		if (scheme ~= "http" and scheme ~= "https") then
+		local url = uri:new(url_encode(values.ipaddr))
+		if (not url or (url:scheme() ~= "http" and url:scheme() ~= "https")) then
 			error_info.ipaddr = "Invalid URL"
 		end
 	end
