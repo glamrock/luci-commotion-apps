@@ -240,10 +240,10 @@ function action_settings()
 end
 
 function action_add(edit_app)
-	
 	local UUID, values, tmpl, type_tmpl, service_type, app_types, service_string, service_file, signing_tmpl, signing_msg, resp, signature, fingerprint, deleted_uci, url
 	local uci = luci.model.uci.cursor()
 	local dispatch = require "luci.dispatcher"
+	local encode = require "luci.commotion.encode"
 	local bad_data = {}
 	local error_info = {}
 	local expiration = uci:get("applications","settings","expiration") or 86400
@@ -352,7 +352,7 @@ function action_add(edit_app)
 		if (count and count ~= '' and tonumber(count) >= 100) then
 			error_info.notice = "This node cannot support any more applications at this time. Please contact the node administrator or try again later."
 		else
-			UUID = uci_encode(values.ipaddr .. values.port)
+			UUID = encode.uci(values.ipaddr .. values.port)
 			values.uuid = UUID
 		
 			uci:foreach("applications", "application", 
@@ -396,13 +396,13 @@ function action_add(edit_app)
 	
 	-- Update application if UUID has changed
 	if (luci.http.formvalue("uuid") and edit_app) then 
-		if (luci.http.formvalue("uuid") ~= uci_encode(values.ipaddr .. values.port)) then
+		if (luci.http.formvalue("uuid") ~= encode.uci(values.ipaddr .. values.port)) then
 			if (not uci:delete("applications",luci.http.formvalue("uuid"))) then
 				dispatch.error500("Unable to remove old UCI entry")
 				return
 			end
 			deleted_uci = 1
-			UUID = uci_encode(values.ipaddr .. values.port)
+			UUID = encode.uci(values.ipaddr .. values.port)
 			values.uuid = UUID
 		else
 			UUID = luci.http.formvalue("uuid")
