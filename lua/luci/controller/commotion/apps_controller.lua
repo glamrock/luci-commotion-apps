@@ -245,6 +245,7 @@ function action_add(edit_app)
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
 	local autoapprove = uci:get("applications","settings","autoapprove")
 	local checkconnect = uci:get("applications","settings","checkconnect")
+	local uri = require "uri"
 	
 	values = {
 		  name =  luci.http.formvalue("name"),
@@ -268,6 +269,13 @@ function action_add(edit_app)
 		end
 	end
 	
+	if not is_ip4addr(values.ipaddr) then 
+		local url = uri:new(url_encode(values.ipaddr))
+		if (not url or (url:scheme() ~= "http" and url:scheme() ~= "https")) then
+			error_info.ipaddr = "Invalid URL"
+		end
+	end
+	
 	if (values.port ~= '' and not is_port(values.port)) then
 		error_info.port = "Invalid port number; must be between 1 and 65535"
 	end
@@ -286,6 +294,11 @@ function action_add(edit_app)
 	
 	if (luci.http.formvalue("permanent") and (luci.http.formvalue("permanent") ~= '1' or allowpermanent == '0')) then
 		DIE("Invalid permanent value")
+		return
+	end
+	
+	if (luci.http.formvalue("uuid") and not is_valid_uci(luci.http.formvalue("uuid"))) then
+		DIE("Invalid UUID value")
 		return
 	end
 	
@@ -333,7 +346,7 @@ function action_add(edit_app)
 			url_port = values.ipaddr:match(":[0-9]+")
 			url_port = url_port and url_port:gsub(":","") or ''
 		end
-		local connect = luci.sys.exec("nc -z -w 5 \"" .. url .. '" "' .. ((url_port and url_port ~= "" and not error_info.port) and url_port or "80") .. '"; echo $?')
+		local connect = luci.sys.exec("nc -z -w 5 \"" .. pass_to_shell(url) .. '" "' .. ((url_port and url_port ~= "" and not error_info.port) and pass_to_shell(url_port) or "80") .. '"; echo $?')
 		if (connect:sub(-2,-2) ~= '0') then  -- exit status != 0 -> failed to resolve url
 			error_info.ipaddr = "Failed to resolve URL or connect to host"
 		end
@@ -493,13 +506,13 @@ ${app_types}
 		-- Create Serval identity keypair for service, then sign service advertisement with it
 		signing_msg = printf(signing_tmpl,fields)
 		if (luci.http.formvalue("fingerprint") and is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
-			resp = luci.sys.exec("echo \"" .. signing_msg:gsub("`","\\`"):gsub("$(","\\$") .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s " .. luci.http.formvalue("fingerprint"))
+			resp = luci.sys.exec("echo \"" .. pass_to_shell(signing_msg) .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s " .. luci.http.formvalue("fingerprint"))
 		else
 			if (not deleted_uci and edit_app and not uci:delete("applications",UUID)) then
 				DIE("Unable to remove old UCI entry")
 				return
 			end
-			resp = luci.sys.exec("echo \"" .. signing_msg:gsub("`","\\`"):gsub("$(","\\$") .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s $(SERVALINSTANCE_PATH=/etc/serval servald keyring list |head -1 |grep -o ^[0-9A-F]*)")
+			resp = luci.sys.exec("echo \"" .. pass_to_shell(signing_msg) .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s $(SERVALINSTANCE_PATH=/etc/serval servald keyring list |head -1 |grep -o ^[0-9A-F]*)")
 		end
 		if (luci.sys.exec("echo $?") ~= '0\n' or resp == '') then
 			DIE("Failed to sign service advertisement")
