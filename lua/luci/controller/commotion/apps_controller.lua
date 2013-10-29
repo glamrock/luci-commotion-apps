@@ -4,7 +4,8 @@ require "luci.model.uci"
 require "luci.http"
 require "luci.sys"
 require "luci.fs"
-require "commotion_helpers"
+require "luci.commotion"
+
 function index()
   local uci = luci.model.uci.cursor()
   if uci:get("applications","settings","disabled") == "0" then
@@ -27,6 +28,7 @@ function judge_app()
   local uci = luci.model.uci.cursor()
   local uuid = luci.http.formvalue("uuid")
   local approved = luci.http.formvalue("approved")
+  local dispatch = require "luci.dispatcher"
   uci:foreach("applications", "application",
 	function(app)
   		if (uuid == app.uuid) then
@@ -34,7 +36,7 @@ function judge_app()
   		end
   	end)
   if (not app_id) then
-	  DIE("Application not found")
+	  dispatch.error500("Application not found")
 	  return
   end
   if (uci:set("applications", app_id, "approved", approved) and 
@@ -44,7 +46,7 @@ function judge_app()
     uci:commit('applications')) then
   	luci.http.status(200, "OK")
   else
-  	DIE("Could not judge app")
+  	dispatch.error500("Could not judge app")
   end
 end
 
@@ -122,6 +124,7 @@ end
 function admin_edit_app(error_info, bad_data)
 	local UUID, app_data, types_string
 	local uci = luci.model.uci.cursor()
+	local dispatch = require "luci.dispatcher"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
 	local type_categories = uci:get_list("applications","settings","category")
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
@@ -130,8 +133,8 @@ function admin_edit_app(error_info, bad_data)
 		if (luci.http.formvalue("uuid") and luci.http.formvalue("uuid") ~= '') then
 			UUID = luci.http.formvalue("uuid")
 		else
-			DIE("No UUID given")
-			return
+		   dispatch.error500("No UUID given")
+		   return
 		end
 	
 		-- get app data from UCI
@@ -142,8 +145,8 @@ function admin_edit_app(error_info, bad_data)
 				end
 			end)
 		if (not app_data) then
-			DIE("No application found for given UUID")
-			return
+		   dispatch.error500("No application found for given UUID")
+		   return
 		end
 	else
 		UUID = bad_data.uuid
@@ -187,6 +190,7 @@ end
 function action_settings()
 	local type_table
 	local uci = luci.model.uci.cursor()
+	local dispatch = require "luci.dispatcher"
 	local error_info = {}
 	local settings = {
 		autoapprove = luci.http.formvalue("autoapprove") or '0',
@@ -195,7 +199,7 @@ function action_settings()
 	}
 	for i, val in pairs(settings) do
 		if (val ~= "1" and val ~= "0") then
-			DIE("Invalid form values")
+			dispatch.error500("Invalid form values")
 			return
 		end
 	end
@@ -239,6 +243,7 @@ function action_add(edit_app)
 	
 	local UUID, values, tmpl, type_tmpl, service_type, app_types, service_string, service_file, signing_tmpl, signing_msg, resp, signature, fingerprint, deleted_uci, url
 	local uci = luci.model.uci.cursor()
+	local dispatch = require "luci.dispatcher"
 	local bad_data = {}
 	local error_info = {}
 	local expiration = uci:get("applications","settings","expiration") or 86400
@@ -278,14 +283,14 @@ function action_add(edit_app)
 	
 	if (edit_app) then
 		if (luci.http.formvalue("approved") and luci.http.formvalue("approved") ~= '' and (tonumber(luci.http.formvalue("approved")) ~= 0 and tonumber(luci.http.formvalue("approved")) ~= 1)) then
-			DIE("Invalid approved value") -- fail since this shouldn't happen with a dropdown form
+			dispatch.error500("Invalid approved value") -- fail since this shouldn't happen with a dropdown form
 			return
 		end
 		values.approved = luci.http.formvalue("approved")
 	end
 	
 	if (luci.http.formvalue("permanent") and (luci.http.formvalue("permanent") ~= '1' or allowpermanent == '0')) then
-		DIE("Invalid permanent value")
+		dispatch.error500("Invalid permanent value")
 		return
 	end
 	
@@ -304,13 +309,13 @@ function action_add(edit_app)
 		if (type(luci.http.formvalue("type")) == "table") then
 			for i, type in pairs(luci.http.formvalue("type")) do
 				if (not table.contains(app_types, type)) then
-					DIE("Invalid application type value")
+					dispatch.error500("Invalid application type value")
 					return
 				end
 			end
 		else
 			if (not table.contains(app_types, luci.http.formvalue("type"))) then
-				DIE("Invalid application type value")
+				dispatch.error500("Invalid application type value")
 				return
 			end
 		end
@@ -393,7 +398,7 @@ function action_add(edit_app)
 	if (luci.http.formvalue("uuid") and edit_app) then 
 		if (luci.http.formvalue("uuid") ~= uci_encode(values.ipaddr .. values.port)) then
 			if (not uci:delete("applications",luci.http.formvalue("uuid"))) then
-				DIE("Unable to remove old UCI entry")
+				dispatch.error500("Unable to remove old UCI entry")
 				return
 			end
 			deleted_uci = 1
@@ -496,13 +501,13 @@ ${app_types}
 			resp = luci.sys.exec("echo \"" .. signing_msg:gsub("`","\\`"):gsub("$(","\\$") .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s " .. luci.http.formvalue("fingerprint"))
 		else
 			if (not deleted_uci and edit_app and not uci:delete("applications",UUID)) then
-				DIE("Unable to remove old UCI entry")
+				dispatch.error500("Unable to remove old UCI entry")
 				return
 			end
 			resp = luci.sys.exec("echo \"" .. signing_msg:gsub("`","\\`"):gsub("$(","\\$") .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s $(SERVALINSTANCE_PATH=/etc/serval servald keyring list |head -1 |grep -o ^[0-9A-F]*)")
 		end
 		if (luci.sys.exec("echo $?") ~= '0\n' or resp == '') then
-			DIE("Failed to sign service advertisement")
+			dispatch.error500("Failed to sign service advertisement")
 			return
 		end
 		
@@ -524,7 +529,7 @@ ${app_types}
 			service_file:close()
 			luci.sys.call("/etc/init.d/avahi-daemon restart")
 		else
-			DIE("Failed to create avahi service file")
+			dispatch.error500("Failed to create avahi service file")
 			return
 		end
 		
@@ -536,7 +541,7 @@ ${app_types}
 		or (luci.http.formvalue("uuid") ~= UUID)) then
 		local ret = luci.sys.exec("rm /etc/avahi/services/" .. luci.http.formvalue("uuid") .. ".service; echo $?")
 		if (ret:sub(-2,-2) ~= '0') then
-			DIE("Error removing Avahi service file")
+			dispatch.error500("Error removing Avahi service file")
 			return
 		end
 		luci.sys.call("/etc/init.d/avahi-daemon restart")
