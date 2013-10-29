@@ -93,6 +93,7 @@ end
 function add_app(error_info, bad_data)
 	local uci = luci.model.uci.cursor()
 	local cutil = require "luci.commotion.util"
+	local encode = require "luci.commotion.encode"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
 	local type_categories = uci:get_list("applications","settings","category")
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
@@ -109,14 +110,14 @@ function add_app(error_info, bad_data)
 				if (type_category == bad_data.type) then match=true end
 			end
 			if (match) then
-				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
+				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked="checked "})
 			else
-				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked=""})
 			end
 		end
 	else
 		for i, type_category in pairs(type_categories) do
-			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked=""})
 		end
 	end
 	luci.template.render("commotion/apps_form", {types_string=types_string, err=error_info, app=bad_data, page={type="add", action="/apps/add_submit", allowpermanent=allowpermanent, checkconnect=checkconnect}})
@@ -125,6 +126,7 @@ end
 function admin_edit_app(error_info, bad_data)
 	local UUID, app_data, types_string
 	local cutil = require "luci.commotion.util"
+	local encode = require "luci.commotion.encode"
 	local uci = luci.model.uci.cursor()
 	local dispatch = require "luci.dispatcher"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
@@ -164,9 +166,9 @@ function admin_edit_app(error_info, bad_data)
 			end
 		end
 		if (match) then
-			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked="checked "})
 		else
-			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked=""})
 		end
 	end
 	
@@ -193,6 +195,7 @@ function action_settings()
 	local type_table
 	local uci = luci.model.uci.cursor()
 	local dispatch = require "luci.dispatcher"
+	local encode = require "luci.commotion.encode"
 	local error_info = {}
 	local settings = {
 		autoapprove = luci.http.formvalue("autoapprove") or '0',
@@ -221,7 +224,7 @@ function action_settings()
 			if (app_type == '') then
 				table.remove(type_table,i)
 			else
-				type_table[i] = html_encode(app_type)
+				type_table[i] = encode.html(app_type)
 			end
 		end
 	end
@@ -300,7 +303,7 @@ function action_add(edit_app)
 	-- escape input strings
 	for i, field in pairs(values) do
 		if (i ~= 'ipaddr' and i ~= 'icon') then
-	                values[i] = html_encode(field)
+	                values[i] = encode.html(field)
 		else
 			values[i] = url_encode(field)
 		end
