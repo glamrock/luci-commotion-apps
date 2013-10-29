@@ -92,6 +92,7 @@ end
 
 function add_app(error_info, bad_data)
 	local uci = luci.model.uci.cursor()
+	local cutil = require "luci.commotion.util"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
 	local type_categories = uci:get_list("applications","settings","category")
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
@@ -108,14 +109,14 @@ function add_app(error_info, bad_data)
 				if (type_category == bad_data.type) then match=true end
 			end
 			if (match) then
-				types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
+				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
 			else
-				types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
 			end
 		end
 	else
 		for i, type_category in pairs(type_categories) do
-			types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
 		end
 	end
 	luci.template.render("commotion/apps_form", {types_string=types_string, err=error_info, app=bad_data, page={type="add", action="/apps/add_submit", allowpermanent=allowpermanent, checkconnect=checkconnect}})
@@ -123,6 +124,7 @@ end
 
 function admin_edit_app(error_info, bad_data)
 	local UUID, app_data, types_string
+	local cutil = require "luci.commotion.util"
 	local uci = luci.model.uci.cursor()
 	local dispatch = require "luci.dispatcher"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
@@ -162,9 +164,9 @@ function admin_edit_app(error_info, bad_data)
 			end
 		end
 		if (match) then
-			types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
 		else
-			types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
 		end
 	end
 	
@@ -244,6 +246,7 @@ function action_add(edit_app)
 	local uci = luci.model.uci.cursor()
 	local dispatch = require "luci.dispatcher"
 	local encode = require "luci.commotion.encode"
+	local cutil = require "luci.commotion.util"
 	local bad_data = {}
 	local error_info = {}
 	local expiration = uci:get("applications","settings","expiration") or 86400
@@ -448,7 +451,7 @@ ${app_types}
 
 		-- FILL IN ${TYPE} BY LOOKING UP PORT IN /ETC/SERVICES, DEFAULT TO 'commotion'
 		if (values.port ~= '') then
-			local command = "grep " .. values.port .. "/tcp /etc/services |awk '{ printf(\"%s\", $1) }'"
+			local command = "grep " .. values.port .. "/tcp /etc/services |awk '{ cutil.tprintf((\"%s\", $1) }'"
 			service_type = luci.sys.exec(command)
 			if (service_type == '') then
 				service_type = 'commotion'
@@ -467,17 +470,17 @@ ${app_types}
 			end
 			table.sort(sorted_app_types)
 			for i, app_type in ipairs(sorted_app_types) do
-				app_types = app_types .. printf(type_tmpl, {app_type = app_type})
+				app_types = app_types .. cutil.tprintf(type_tmpl, {app_type = app_type})
 			end
 -- 			for i = #luci.http.formvalue("type"), 1, -1 do
--- 				reverse_app_types = reverse_app_types .. printf(type_tmpl, {app_type = luci.http.formvalue("type")[i]})
+-- 				reverse_app_types = reverse_app_types .. cutil.tprintf(type_tmpl, {app_type = luci.http.formvalue("type")[i]})
 -- 			end
 		else
 			if (luci.http.formvalue("type") == '' or luci.http.formvalue("type") == nil) then
 				app_types = ''
 -- 				reverse_app_types = ''
 			else
-				app_types = printf(type_tmpl, {app_type = luci.http.formvalue("type")})
+				app_types = cutil.tprintf(type_tmpl, {app_type = luci.http.formvalue("type")})
 -- 				reverse_app_types = app_types
 			end
 		end
@@ -496,7 +499,7 @@ ${app_types}
 		}
 		
 		-- Create Serval identity keypair for service, then sign service advertisement with it
-		signing_msg = printf(signing_tmpl,fields)
+		signing_msg = cutil.tprintf(signing_tmpl,fields)
 		if (luci.http.formvalue("fingerprint") and is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
 			resp = luci.sys.exec("echo \"" .. signing_msg:gsub("`","\\`"):gsub("$(","\\$") .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s " .. luci.http.formvalue("fingerprint"))
 		else
@@ -519,7 +522,7 @@ ${app_types}
 -- 		fields.app_types = reverse_app_types -- include service types in reverse order since avahi-client parses txt-records in reverse order
 		fields.app_types = app_types -- service types are in alphabetical order
 		
-		service_string = printf(tmpl,fields)
+		service_string = cutil.tprintf(tmpl,fields)
 		
 		-- create service file, then restart avahi-daemon
 		service_file = io.open("/etc/avahi/services/" .. UUID .. ".service", "w")
