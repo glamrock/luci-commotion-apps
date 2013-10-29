@@ -305,7 +305,7 @@ function action_add(edit_app)
 		if (i ~= 'ipaddr' and i ~= 'icon') then
 	                values[i] = encode.html(field)
 		else
-			values[i] = url_encode(field)
+			values[i] = encode.url(field)
 		end
         end
 	
