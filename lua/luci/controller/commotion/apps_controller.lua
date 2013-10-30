@@ -505,7 +505,7 @@ ${app_types}
 		
 		-- Create Serval identity keypair for service, then sign service advertisement with it
 		signing_msg = cutil.tprintf(signing_tmpl,fields)
-		if (luci.http.formvalue("fingerprint") and is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
+		if (luci.http.formvalue("fingerprint") and id.is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
 			resp = luci.sys.exec("echo \"" .. signing_msg:gsub("`","\\`"):gsub("$(","\\$") .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-sign -s " .. luci.http.formvalue("fingerprint"))
 		else
 			if (not deleted_uci and edit_app and not uci:delete("applications",UUID)) then
