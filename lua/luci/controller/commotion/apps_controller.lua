@@ -250,6 +250,7 @@ function action_add(edit_app)
 	local dispatch = require "luci.dispatcher"
 	local encode = require "luci.commotion.encode"
 	local cutil = require "luci.commotion.util"
+	local id = require "luci.commotion.identify"
 	local bad_data = {}
 	local error_info = {}
 	local expiration = uci:get("applications","settings","expiration") or 86400
@@ -330,7 +331,7 @@ function action_add(edit_app)
 	
 	-- Check service for connectivity, if requested
 	if (checkconnect == "1") then
-		if (values.ipaddr ~= '' and not is_ip4addr(values.ipaddr)) then
+		if (values.ipaddr ~= '' and not id.is_ip4addr(values.ipaddr)) then
 			url = string.gsub(values.ipaddr, '[a-z]+://', '', 1)
 			url = url:match("^[^/:]+") -- remove anything after the domain name/IP address
 			-- url = url:match("[%a%d-]+\.%w+$") -- remove subdomains (** actually we should probably keep subdomains **)
