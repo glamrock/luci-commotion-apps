@@ -281,7 +281,7 @@ function action_add(edit_app)
 		end
 	end
 	
-	if (values.port ~= '' and not is_port(values.port)) then
+	if (values.port ~= '' and not id.is_port(values.port)) then
 		error_info.port = "Invalid port number; must be between 1 and 65535"
 	end
 	
