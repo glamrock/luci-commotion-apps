@@ -196,6 +196,7 @@ function action_settings()
 	local uci = luci.model.uci.cursor()
 	local dispatch = require "luci.dispatcher"
 	local encode = require "luci.commotion.encode"
+	local id = require "luci.commotion.identify"
 	local error_info = {}
 	local settings = {
 		autoapprove = luci.http.formvalue("autoapprove") or '0',
@@ -209,7 +210,7 @@ function action_settings()
 		end
 	end
 	settings.expiration = luci.http.formvalue("expiration")
-	if (not settings.expiration or settings.expiration == '' or not is_uint(settings.expiration) or tonumber(settings.expiration) <= 0) then
+	if (not settings.expiration or settings.expiration == '' or not id.is_uint(settings.expiration) or tonumber(settings.expiration) <= 0) then
 		error_info.expiration = "Expiration value must be integer greater than zero"
 	end
 	if (not luci.http.formvalue("app_type") or luci.http.formvalue("app_type") == '') then
@@ -284,7 +285,7 @@ function action_add(edit_app)
 		error_info.port = "Invalid port number; must be between 1 and 65535"
 	end
 	
-	if (values.ttl ~= '' and not is_uint(values.ttl)) then
+	if (values.ttl ~= '' and not id.is_uint(values.ttl)) then
 		error_info.ttl = "Invalid TTL value; must be integer greater than zero"
 	end
 	
