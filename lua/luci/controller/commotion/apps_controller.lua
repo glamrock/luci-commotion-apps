@@ -252,6 +252,7 @@ function action_add(edit_app)
 	local encode = require "luci.commotion.encode"
 	local cutil = require "luci.commotion.util"
 	local id = require "luci.commotion.identify"
+	local luci_util = require "luci.util"
 	local bad_data = {}
 	local error_info = {}
 	local expiration = uci:get("applications","settings","expiration") or 86400
@@ -316,13 +317,13 @@ function action_add(edit_app)
 		app_types = uci:get_list("applications","settings","category")
 		if (type(luci.http.formvalue("type")) == "table") then
 			for i, type in pairs(luci.http.formvalue("type")) do
-				if (not table.contains(app_types, type)) then
+				if (not luci_util.contains(app_types, type)) then
 					dispatch.error500("Invalid application type value")
 					return
 				end
 			end
 		else
-			if (not table.contains(app_types, luci.http.formvalue("type"))) then
+			if (not luci_util.contains(app_types, luci.http.formvalue("type"))) then
 				dispatch.error500("Invalid application type value")
 				return
 			end
