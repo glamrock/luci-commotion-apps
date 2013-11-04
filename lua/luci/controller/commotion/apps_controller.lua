@@ -4,7 +4,6 @@ require "luci.model.uci"
 require "luci.http"
 require "luci.sys"
 require "luci.fs"
-require "luci.commotion"
 
 function index()
   local uci = luci.model.uci.cursor()
