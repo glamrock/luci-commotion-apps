@@ -64,6 +64,26 @@ text-align:right;
 .info-button { position:absolute; top:0; left:0; }
 .app-info:hover .app-tooltip { display:block; position:absolute; }
 
+
+/* App Icon selection area in apps_form.html */
+
+.icon-choices {
+	max-width: 400px; /* 4x80 + 4x20 padding */
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.icon-choices input {
+	padding: 10px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	border: 1px #888888;
+	-webkit-box-shadow: 0px 0px 5px rgba(221, 221, 221, 1);
+	-moz-box-shadow:    0px 0px 5px rgba(221, 221, 221, 1);
+	box-shadow:         0px 0px 5px rgba(221, 221, 221, 1);
+}
+
 .signature, .colorprint { font-family: "Courier New"; font-weight:bold; font-size: 14px; }
 
 button.approve { background: url("check.png") no-repeat left center; }
@@ -93,3 +113,15 @@ fieldset legend { padding-top:0; }
   top: 5px;
   right: 5px;
 }
+
+.icon-choices {
+  max-width: 320px;
+}
+
+.icon-choice input {
+  width: 60px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+
