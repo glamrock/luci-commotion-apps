@@ -284,7 +284,7 @@ function action_add(edit_app)
 	end
 	
 	if not id.is_ip4addr(values.ipaddr) then 
-		local url = uri:new(url_encode(values.ipaddr))
+		local url = uri:new(encode.url(values.ipaddr))
 		if (not url or (url:scheme() ~= "http" and url:scheme() ~= "https")) then
 			error_info.ipaddr = "Invalid URL"
 		end
@@ -311,7 +311,7 @@ function action_add(edit_app)
 		return
 	end
 	
-	if (luci.http.formvalue("uuid") and not is_valid_uci(luci.http.formvalue("uuid"))) then
+	if (luci.http.formvalue("uuid") and not id.is_valid_uci(luci.http.formvalue("uuid"))) then
 		DIE("Invalid UUID value")
 		return
 	end
