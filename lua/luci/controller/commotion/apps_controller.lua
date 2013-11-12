@@ -1,10 +1,11 @@
+
 module("luci.controller.commotion.apps_controller", package.seeall)
 
 require "luci.model.uci"
 require "luci.http"
 require "luci.sys"
 require "luci.fs"
-require "commotion_helpers"
+
 function index()
   local uci = luci.model.uci.cursor()
   if uci:get("applications","settings","disabled") == "0" then
@@ -27,6 +28,7 @@ function judge_app()
   local uci = luci.model.uci.cursor()
   local uuid = luci.http.formvalue("uuid")
   local approved = luci.http.formvalue("approved")
+  local dispatch = require "luci.dispatcher"
   uci:foreach("applications", "application",
 	function(app)
   		if (uuid == app.uuid) then
@@ -34,7 +36,7 @@ function judge_app()
   		end
   	end)
   if (not app_id) then
-	  DIE("Application not found")
+	  dispatch.error500("Application not found")
 	  return
   end
   if (uci:set("applications", app_id, "approved", approved) and 
@@ -44,7 +46,7 @@ function judge_app()
     uci:commit('applications')) then
   	luci.http.status(200, "OK")
   else
-  	DIE("Could not judge app")
+  	dispatch.error500("Could not judge app")
   end
 end
 
@@ -90,6 +92,8 @@ end
 
 function add_app(error_info, bad_data)
 	local uci = luci.model.uci.cursor()
+	local cutil = require "luci.commotion.util"
+	local encode = require "luci.commotion.encode"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
 	local type_categories = uci:get_list("applications","settings","category")
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
@@ -106,14 +110,14 @@ function add_app(error_info, bad_data)
 				if (type_category == bad_data.type) then match=true end
 			end
 			if (match) then
-				types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
+				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked="checked "})
 			else
-				types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+				types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked=""})
 			end
 		end
 	else
 		for i, type_category in pairs(type_categories) do
-			types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked=""})
 		end
 	end
 	luci.template.render("commotion/apps_form", {types_string=types_string, err=error_info, app=bad_data, page={type="add", action="/apps/add_submit", allowpermanent=allowpermanent, checkconnect=checkconnect}})
@@ -121,7 +125,10 @@ end
 
 function admin_edit_app(error_info, bad_data)
 	local UUID, app_data, types_string
+	local cutil = require "luci.commotion.util"
+	local encode = require "luci.commotion.encode"
 	local uci = luci.model.uci.cursor()
+	local dispatch = require "luci.dispatcher"
 	local type_tmpl = '<input type="checkbox" name="type" value="${type_escaped}" ${checked}/>${type}<br />'
 	local type_categories = uci:get_list("applications","settings","category")
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
@@ -130,8 +137,8 @@ function admin_edit_app(error_info, bad_data)
 		if (luci.http.formvalue("uuid") and luci.http.formvalue("uuid") ~= '') then
 			UUID = luci.http.formvalue("uuid")
 		else
-			DIE("No UUID given")
-			return
+		   dispatch.error500("No UUID given")
+		   return
 		end
 	
 		-- get app data from UCI
@@ -142,8 +149,8 @@ function admin_edit_app(error_info, bad_data)
 				end
 			end)
 		if (not app_data) then
-			DIE("No application found for given UUID")
-			return
+		   dispatch.error500("No application found for given UUID")
+		   return
 		end
 	else
 		UUID = bad_data.uuid
@@ -159,9 +166,9 @@ function admin_edit_app(error_info, bad_data)
 			end
 		end
 		if (match) then
-			types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked="checked "})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked="checked "})
 		else
-			types_string = types_string .. printf(type_tmpl, {type=type_category, type_escaped=html_encode(type_category), checked=""})
+			types_string = types_string .. cutil.tprintf(type_tmpl, {type=type_category, type_escaped=encode.html(type_category), checked=""})
 		end
 	end
 	
@@ -187,6 +194,9 @@ end
 function action_settings()
 	local type_table
 	local uci = luci.model.uci.cursor()
+	local dispatch = require "luci.dispatcher"
+	local encode = require "luci.commotion.encode"
+	local id = require "luci.commotion.identify"
 	local error_info = {}
 	local settings = {
 		autoapprove = luci.http.formvalue("autoapprove") or '0',
@@ -195,12 +205,12 @@ function action_settings()
 	}
 	for i, val in pairs(settings) do
 		if (val ~= "1" and val ~= "0") then
-			DIE("Invalid form values")
+			dispatch.error500("Invalid form values")
 			return
 		end
 	end
 	settings.expiration = luci.http.formvalue("expiration")
-	if (not settings.expiration or settings.expiration == '' or not is_uint(settings.expiration) or tonumber(settings.expiration) <= 0) then
+	if (not settings.expiration or settings.expiration == '' or not id.is_uint(settings.expiration) or tonumber(settings.expiration) <= 0) then
 		error_info.expiration = "Expiration value must be integer greater than zero"
 	end
 	if (not luci.http.formvalue("app_type") or luci.http.formvalue("app_type") == '') then
@@ -215,7 +225,7 @@ function action_settings()
 			if (app_type == '') then
 				table.remove(type_table,i)
 			else
-				type_table[i] = html_encode(app_type)
+				type_table[i] = encode.html(app_type)
 			end
 		end
 	end
@@ -236,9 +246,13 @@ function action_settings()
 end
 
 function action_add(edit_app)
-	
 	local UUID, values, tmpl, type_tmpl, service_type, app_types, service_string, service_file, signing_tmpl, signing_msg, resp, signature, fingerprint, deleted_uci, url
 	local uci = luci.model.uci.cursor()
+	local dispatch = require "luci.dispatcher"
+	local encode = require "luci.commotion.encode"
+	local cutil = require "luci.commotion.util"
+	local id = require "luci.commotion.identify"
+	local luci_util = require "luci.util"
 	local bad_data = {}
 	local error_info = {}
 	local expiration = uci:get("applications","settings","expiration") or 86400
@@ -269,31 +283,31 @@ function action_add(edit_app)
 		end
 	end
 	
-	if not is_ip4addr(values.ipaddr) then 
+	if not id.is_ip4addr(values.ipaddr) then 
 		local url = uri:new(url_encode(values.ipaddr))
 		if (not url or (url:scheme() ~= "http" and url:scheme() ~= "https")) then
 			error_info.ipaddr = "Invalid URL"
 		end
 	end
 	
-	if (values.port ~= '' and not is_port(values.port)) then
+	if (values.port ~= '' and not id.is_port(values.port)) then
 		error_info.port = "Invalid port number; must be between 1 and 65535"
 	end
 	
-	if (values.ttl ~= '' and not is_uint(values.ttl)) then
+	if (values.ttl ~= '' and not id.is_uint(values.ttl)) then
 		error_info.ttl = "Invalid TTL value; must be integer greater than zero"
 	end
 	
 	if (edit_app) then
 		if (luci.http.formvalue("approved") and luci.http.formvalue("approved") ~= '' and (tonumber(luci.http.formvalue("approved")) ~= 0 and tonumber(luci.http.formvalue("approved")) ~= 1)) then
-			DIE("Invalid approved value") -- fail since this shouldn't happen with a dropdown form
+			dispatch.error500("Invalid approved value") -- fail since this shouldn't happen with a dropdown form
 			return
 		end
 		values.approved = luci.http.formvalue("approved")
 	end
 	
 	if (luci.http.formvalue("permanent") and (luci.http.formvalue("permanent") ~= '1' or allowpermanent == '0')) then
-		DIE("Invalid permanent value")
+		dispatch.error500("Invalid permanent value")
 		return
 	end
 	
@@ -305,9 +319,9 @@ function action_add(edit_app)
 	-- escape input strings
 	for i, field in pairs(values) do
 		if (i ~= 'ipaddr' and i ~= 'icon') then
-	                values[i] = html_encode(field)
+	                values[i] = encode.html(field)
 		else
-			values[i] = url_encode(field)
+			values[i] = encode.url(field)
 		end
         end
 	
@@ -316,14 +330,14 @@ function action_add(edit_app)
 		app_types = uci:get_list("applications","settings","category")
 		if (type(luci.http.formvalue("type")) == "table") then
 			for i, type in pairs(luci.http.formvalue("type")) do
-				if (not table.contains(app_types, type)) then
-					DIE("Invalid application type value")
+				if (not luci_util.contains(app_types, type)) then
+					dispatch.error500("Invalid application type value")
 					return
 				end
 			end
 		else
-			if (not table.contains(app_types, luci.http.formvalue("type"))) then
-				DIE("Invalid application type value")
+			if (not luci_util.contains(app_types, luci.http.formvalue("type"))) then
+				dispatch.error500("Invalid application type value")
 				return
 			end
 		end
@@ -332,7 +346,7 @@ function action_add(edit_app)
 	
 	-- Check service for connectivity, if requested
 	if (checkconnect == "1") then
-		if (values.ipaddr ~= '' and not is_ip4addr(values.ipaddr)) then
+		if (values.ipaddr ~= '' and not id.is_ip4addr(values.ipaddr)) then
 			url = string.gsub(values.ipaddr, '[a-z]+://', '', 1)
 			url = url:match("^[^/:]+") -- remove anything after the domain name/IP address
 			-- url = url:match("[%a%d-]+\.%w+$") -- remove subdomains (** actually we should probably keep subdomains **)
@@ -360,7 +374,7 @@ function action_add(edit_app)
 		if (count and count ~= '' and tonumber(count) >= 100) then
 			error_info.notice = "This node cannot support any more applications at this time. Please contact the node administrator or try again later."
 		else
-			UUID = uci_encode(values.ipaddr .. values.port)
+			UUID = encode.uci(values.ipaddr .. values.port)
 			values.uuid = UUID
 		
 			uci:foreach("applications", "application", 
@@ -404,13 +418,13 @@ function action_add(edit_app)
 	
 	-- Update application if UUID has changed
 	if (luci.http.formvalue("uuid") and edit_app) then 
-		if (luci.http.formvalue("uuid") ~= uci_encode(values.ipaddr .. values.port)) then
+		if (luci.http.formvalue("uuid") ~= encode.uci(values.ipaddr .. values.port)) then
 			if (not uci:delete("applications",luci.http.formvalue("uuid"))) then
-				DIE("Unable to remove old UCI entry")
+				dispatch.error500("Unable to remove old UCI entry")
 				return
 			end
 			deleted_uci = 1
-			UUID = uci_encode(values.ipaddr .. values.port)
+			UUID = encode.uci(values.ipaddr .. values.port)
 			values.uuid = UUID
 		else
 			UUID = luci.http.formvalue("uuid")
@@ -456,7 +470,7 @@ ${app_types}
 
 		-- FILL IN ${TYPE} BY LOOKING UP PORT IN /ETC/SERVICES, DEFAULT TO 'commotion'
 		if (values.port ~= '') then
-			local command = "grep " .. values.port .. "/tcp /etc/services |awk '{ printf(\"%s\", $1) }'"
+			local command = "grep " .. values.port .. "/tcp /etc/services |awk '{ cutil.tprintf((\"%s\", $1) }'"
 			service_type = luci.sys.exec(command)
 			if (service_type == '') then
 				service_type = 'commotion'
@@ -475,17 +489,17 @@ ${app_types}
 			end
 			table.sort(sorted_app_types)
 			for i, app_type in ipairs(sorted_app_types) do
-				app_types = app_types .. printf(type_tmpl, {app_type = app_type})
+				app_types = app_types .. cutil.tprintf(type_tmpl, {app_type = app_type})
 			end
 -- 			for i = #luci.http.formvalue("type"), 1, -1 do
--- 				reverse_app_types = reverse_app_types .. printf(type_tmpl, {app_type = luci.http.formvalue("type")[i]})
+-- 				reverse_app_types = reverse_app_types .. cutil.tprintf(type_tmpl, {app_type = luci.http.formvalue("type")[i]})
 -- 			end
 		else
 			if (luci.http.formvalue("type") == '' or luci.http.formvalue("type") == nil) then
 				app_types = ''
 -- 				reverse_app_types = ''
 			else
-				app_types = printf(type_tmpl, {app_type = luci.http.formvalue("type")})
+				app_types = cutil.tprintf(type_tmpl, {app_type = luci.http.formvalue("type")})
 -- 				reverse_app_types = app_types
 			end
 		end
@@ -504,18 +518,18 @@ ${app_types}
 		}
 		
 		-- Create Serval identity keypair for service, then sign service advertisement with it
-		signing_msg = printf(signing_tmpl,fields)
-		if (luci.http.formvalue("fingerprint") and is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
+		signing_msg = cutil.tprintf(signing_tmpl,fields)
+		if (luci.http.formvalue("fingerprint") and id.is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
 			resp = luci.sys.exec("echo \"" .. pass_to_shell(signing_msg) .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-crypto --sign -i " .. luci.http.formvalue("fingerprint"))
 		else
 			if (not deleted_uci and edit_app and not uci:delete("applications",UUID)) then
-				DIE("Unable to remove old UCI entry")
+				dispatch.error500("Unable to remove old UCI entry")
 				return
 			end
 			resp = luci.sys.exec("echo \"" .. pass_to_shell(signing_msg) .. "\" |SERVALINSTANCE_PATH=/etc/serval serval-crypto --sign -i $(SERVALINSTANCE_PATH=/etc/serval servald keyring list |head -1 |grep -o ^[0-9A-F]*)")
 		end
 		if (luci.sys.exec("echo $?") ~= '0\n' or resp == '') then
-			DIE("Failed to sign service advertisement")
+			dispatch.error500("Failed to sign service advertisement")
 			return
 		end
 		
@@ -527,7 +541,7 @@ ${app_types}
 -- 		fields.app_types = reverse_app_types -- include service types in reverse order since avahi-client parses txt-records in reverse order
 		fields.app_types = app_types -- service types are in alphabetical order
 		
-		service_string = printf(tmpl,fields)
+		service_string = cutil.tprintf(tmpl,fields)
 		
 		-- create service file, then restart avahi-daemon
 		service_file = io.open("/etc/avahi/services/" .. UUID .. ".service", "w")
@@ -537,7 +551,7 @@ ${app_types}
 			service_file:close()
 			luci.sys.exec("/etc/init.d/avahi-daemon restart")
 		else
-			DIE("Failed to create avahi service file")
+			dispatch.error500("Failed to create avahi service file")
 			return
 		end
 		
@@ -549,7 +563,7 @@ ${app_types}
 		or (luci.http.formvalue("uuid") ~= UUID)) then
 		local ret = luci.sys.exec("rm /etc/avahi/services/" .. luci.http.formvalue("uuid") .. ".service; echo $?")
 		if (ret:sub(-2,-2) ~= '0') then
-			DIE("Error removing Avahi service file")
+			dispatch.error500("Error removing Avahi service file")
 			return
 		end
 		luci.sys.exec("/etc/init.d/avahi-daemon restart")
