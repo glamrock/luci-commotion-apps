@@ -25,8 +25,8 @@
     <div class="cbi-value">
       <label class="cbi-value-title tippable" data-tip="Applications that are not marked as 'permanent' will be automatically be removed from the application list after this amount of time.">Expiration period (seconds):</label>
       <div class="cbi-value-field">
-	  <input type="text" name="expiration" value="<%=settings.expiration%>" class="cbi-input-text" />
-	  <%if err then%><div class="error"><%=err.expiration%></div><%end%>
+	  <input type="text" name="lifetime" value="<%=settings.lifetime%>" class="cbi-input-text" />
+	  <%if err then%><div class="error"><%=err.lifetime%></div><%end%>
 	  <div class="cbi-value-description">For example, 24 hours = 86400 seconds</div>
       </div>
     </div>

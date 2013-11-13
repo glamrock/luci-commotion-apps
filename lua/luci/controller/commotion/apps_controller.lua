@@ -176,14 +176,14 @@ function admin_edit_app(error_info, bad_data)
 end
 
 function admin_edit_settings(error_info, bad_settings)
-	local expiration
+	local lifetime
 	local uci = luci.model.uci.cursor()
 	local types = uci:get_list("applications","settings","category")
 	local settings = {}
 	if (bad_settings) then
 		settings = bad_settings
 	else
-		settings.expiration = uci:get("applications","settings","expiration")
+		settings.lifetime = uci:get("applications","settings","lifetime")
 		settings.autoapprove = uci:get("applications","settings","autoapprove")
 		settings.allowpermanent = uci:get("applications","settings","allowpermanent")
 		settings.checkconnect = uci:get("applications","settings","checkconnect")
@@ -209,9 +209,9 @@ function action_settings()
 			return
 		end
 	end
-	settings.expiration = luci.http.formvalue("expiration")
-	if (not settings.expiration or settings.expiration == '' or not id.is_uint(settings.expiration) or tonumber(settings.expiration) <= 0) then
-		error_info.expiration = "Expiration value must be integer greater than zero"
+	settings.lifetime = luci.http.formvalue("lifetime")
+	if (not settings.lifetime or settings.lifetime == '' or not id.is_uint(settings.lifetime) or tonumber(settings.lifetime) <= 0) then
+		error_info.lifetime = "Expiration value must be integer greater than zero"
 	end
 	if (not luci.http.formvalue("app_type") or luci.http.formvalue("app_type") == '') then
 		error_info.app_type = "Must include at least one category"
@@ -236,7 +236,6 @@ function action_settings()
 	else
 		uci:set_list("applications", "settings", "category", type_table)
 		for i, val in pairs(settings) do
-			--uci:set("applications","settings","expiration",luci.http.formvalue("expiration"))
 			uci:set("applications","settings",i,val)
 		end
 		uci:save("applications")
@@ -255,7 +254,7 @@ function action_add(edit_app)
 	local luci_util = require "luci.util"
 	local bad_data = {}
 	local error_info = {}
-	local expiration = uci:get("applications","settings","expiration") or 86400
+	local lifetime = uci:get("applications","settings","lifetime") or 86400
 	local allowpermanent = uci:get("applications","settings","allowpermanent")
 	local autoapprove = uci:get("applications","settings","autoapprove")
 	local checkconnect = uci:get("applications","settings","checkconnect")
@@ -263,7 +262,7 @@ function action_add(edit_app)
 	
 	values = {
 		  name =  luci.http.formvalue("name"),
-		  ipaddr =  luci.http.formvalue("ipaddr"),
+		  uri =  luci.http.formvalue("uri"),
 		  port = luci.http.formvalue("port"),
 		  icon =  luci.http.formvalue("icon"),
 		  description =  luci.http.formvalue("description"),
@@ -277,16 +276,16 @@ function action_add(edit_app)
 	-- ###########################################
 	-- #           INPUT VALIDATION              #
 	-- ###########################################
-	for i, val in pairs({"name","ipaddr","description","icon"}) do
+	for i, val in pairs({"name","uri","description","icon"}) do
 		if (not luci.http.formvalue(val) or luci.http.formvalue(val) == '') then
 			error_info[val] = "Missing value"
 		end
 	end
 	
-	if not id.is_ip4addr(values.ipaddr) then 
-		local url = uri:new(encode.url(values.ipaddr))
+	if not id.is_ip4addr(values.uri) then 
+		local url = uri:new(encode.url(values.uri))
 		if (not url or (url:scheme() ~= "http" and url:scheme() ~= "https")) then
-			error_info.ipaddr = "Invalid URL"
+			error_info.uri = "Invalid URL"
 		end
 	end
 	
@@ -318,7 +317,7 @@ function action_add(edit_app)
 	
 	-- escape input strings
 	for i, field in pairs(values) do
-		if (i ~= 'ipaddr' and i ~= 'icon') then
+		if (i ~= 'uri' and i ~= 'icon') then
 	                values[i] = encode.html(field)
 		else
 			values[i] = encode.url(field)
@@ -346,23 +345,23 @@ function action_add(edit_app)
 	
 	-- Check service for connectivity, if requested
 	if (checkconnect == "1") then
-		if (values.ipaddr ~= '' and not id.is_ip4addr(values.ipaddr)) then
-			url = string.gsub(values.ipaddr, '[a-z]+://', '', 1)
+		if (values.uri ~= '' and not id.is_ip4addr(values.uri)) then
+			url = string.gsub(values.uri, '[a-z]+://', '', 1)
 			url = url:match("^[^/:]+") -- remove anything after the domain name/IP address
 			-- url = url:match("[%a%d-]+\.%w+$") -- remove subdomains (** actually we should probably keep subdomains **)
 		else
-			url = values.ipaddr
+			url = values.uri
 		end
 		local url_port
 		if (values.port and values.port ~= '') then
 			url_port = values.port
 		else
-			url_port = values.ipaddr:match(":[0-9]+")
+			url_port = values.uri:match(":[0-9]+")
 			url_port = url_port and url_port:gsub(":","") or ''
 		end
 		local connect = luci.sys.exec("nc -z -w 5 \"" .. cutil.pass_to_shell(url) .. '" "' .. ((url_port and url_port ~= "" and not error_info.port) and cutil.pass_to_shell(url_port) or "80") .. '"; echo $?')
 		if (connect:sub(-2,-2) ~= '0') then  -- exit status != 0 -> failed to resolve url
-			error_info.ipaddr = "Failed to resolve URL or connect to host"
+			error_info.uri = "Failed to resolve URL or connect to host"
 		end
 	end
 		
@@ -374,7 +373,7 @@ function action_add(edit_app)
 		if (count and count ~= '' and tonumber(count) >= 100) then
 			error_info.notice = "This node cannot support any more applications at this time. Please contact the node administrator or try again later."
 		else
-			UUID = encode.uci(values.ipaddr .. values.port)
+			UUID = encode.uci(values.uri .. values.port)
 			values.uuid = UUID
 		
 			uci:foreach("applications", "application", 
@@ -410,21 +409,21 @@ function action_add(edit_app)
 	end
 	if ((allowpermanent == '1' and luci.http.formvalue("permanent") == nil) or allowpermanent == '0') then
 		--values.permanent = '0'
-		values.expiration = os.date("%c",os.time() + expiration) -- Add expiration time
+		values.lifetime = os.date("%c",os.time() + lifetime) -- Add expiration time
 	elseif (allowpermanent == '1' and luci.http.formvalue("permanent") and luci.http.formvalue("permanent") == '1') then
-		values.expiration = '0'
+		values.lifetime = '0'
 	end
 	if (values.ttl == '') then values.ttl = '0' end
 	
 	-- Update application if UUID has changed
 	if (luci.http.formvalue("uuid") and edit_app) then 
-		if (luci.http.formvalue("uuid") ~= encode.uci(values.ipaddr .. values.port)) then
+		if (luci.http.formvalue("uuid") ~= encode.uci(values.uri .. values.port)) then
 			if (not uci:delete("applications",luci.http.formvalue("uuid"))) then
 				dispatch.error500("Unable to remove old UCI entry")
 				return
 			end
 			deleted_uci = 1
-			UUID = encode.uci(values.ipaddr .. values.port)
+			UUID = encode.uci(values.uri .. values.port)
 			values.uuid = UUID
 		else
 			UUID = luci.http.formvalue("uuid")
@@ -441,13 +440,13 @@ function action_add(edit_app)
 		signing_tmpl = [[<type>_${type}._tcp</type>
 <domain-name>mesh.local</domain-name>
 <port>${port}</port>
-<txt-record>application=${name}</txt-record>
+<txt-record>name=${name}</txt-record>
 <txt-record>ttl=${ttl}</txt-record>
-<txt-record>ipaddr=${ipaddr}</txt-record>
+<txt-record>uri=${uri}</txt-record>
 ${app_types}
 <txt-record>icon=${icon}</txt-record>
 <txt-record>description=${description}</txt-record>
-<txt-record>expiration=${expiration}</txt-record>]]
+<txt-record>lifetime=${lifetime}</txt-record>]]
 		tmpl = [[
 <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
 <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
@@ -464,6 +463,7 @@ ${app_types}
 
 <txt-record>signature=${signature}</txt-record>
 <txt-record>fingerprint=${fingerprint}</txt-record>
+<txt-record>version=1.0</txt-record>
 </service>
 </service-group>
 ]]
@@ -508,13 +508,13 @@ ${app_types}
 		  uuid = UUID,
 		  name = values.name,
 		  type = service_type,
-		  ipaddr = values.ipaddr,
+		  uri = values.uri,
 		  port = values.port,
 		  icon = values.icon,
 		  description = values.description,
 		  ttl = values.ttl,
 		  app_types = app_types,
-		  expiration = expiration
+		  lifetime = lifetime
 		}
 		
 		-- Create Serval identity keypair for service, then sign service advertisement with it

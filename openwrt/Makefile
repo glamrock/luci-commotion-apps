@@ -7,7 +7,7 @@ THEME_NAME:=commotion
 THEME_TITLE:=Commotion
 
 PKG_NAME:=$(MODULE_NAME)
-PKG_VERSION:=1.0
+PKG_VERSION:=master
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
@@ -35,25 +35,14 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/description
-  Provides a discovery mechanism and LuCI interface for local applications on a Commotion mesh network
+  Provides a LuCI interface for local applications on a Commotion mesh network
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(CP) $(PKG_BUILD_DIR)/uci-defaults/commotion-apps $(1)/etc/uci-defaults/commotion-apps || true
 	$(INSTALL_DIR) $(1)/www/luci-static/$(THEME_NAME)
 	$(CP) $(PKG_BUILD_DIR)/luci-static/$(THEME_NAME)/* $(1)/www/luci-static/$(THEME_NAME)/ || true
 	$(INSTALL_DIR) $(1)/usr/lib/lua
 	$(CP) $(PKG_BUILD_DIR)/lua/* $(1)/usr/lib/lua/ || true
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/commotion-service-parser $(1)/usr/sbin/ || true
-endef
-
-define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-[ -n "$${IPKG_INSTROOT}" ] || {
-        ( . /etc/uci-defaults/commotion-apps ) && rm -f /etc/uci-defaults/commotion-apps
-}
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
