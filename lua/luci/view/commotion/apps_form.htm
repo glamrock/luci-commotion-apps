@@ -2,6 +2,14 @@
 
 <link rel="stylesheet" type="text/css" href="<%=media%>/apps.css" />
 <script type="text/javascript" src="<%=media%>/apps_form.js"></script>
+<script>
+	// App icon selection
+      function insertText(elemID, text)
+      {
+        var elem = document.getElementById(elemID);
+        elem.innerHTML += text;
+      }
+    </script>
 
 <h2><a id="content" name="content">
   <% if page.type == "add" then %>
@@ -45,13 +53,35 @@
   	<div class="cbi-value-description">Choose any relevant categories that describe your application.</div>
       </div>
     </div>
+
+
     <div class="cbi-value">
-      <label class="cbi-value-title">URL of application Icon:</label>
+      <label class="cbi-value-title">Application Icon:</label>
       <div class="cbi-value-field">
-  	<input type="text" name="icon" <% if app then %>value="<%=app.icon%>"<% end %>/>
+
+  	<input type="text" name="icon" id="icon" <% if app then %>value="<%=app.icon%>" <% else %>value="<%=media%>/commotion-faded.png"<% end %>/>
   	<%if err then%><div class="error"><%=err.icon%></div><%end%>
   	<div class="cbi-value-description">This should be a URL of an image file that will be displayed next to the listing of your application.</div>
       </div>
+
+		<div class="icon-choices">
+			<noscript>Please enable javascript to select one of these icons.</noscript>
+			<!-- divided into segments of four, since that's how they appear on the site -->
+			<input type="img" src="<%=media%>/code.svg" value="Programming" alt="Programming" onclick="insertText('icon', '<%=media%>/code.svg');" />
+			<input type="img" src="<%=media%>/chat.svg" value="Chat" alt="Chat" onclick="insertText('icon', '<%=media%>/chat.svg');" />
+			<input type="img" src="<%=media%>/email.svg" value="Email" alt="Email" onclick="insertText('icon', '<%=media%>/email.svg');" />
+			<input type="img" src="<%=media%>/downloads.svg" value="File Sharing" alt="File Sharing" onclick="insertText('icon', '<%=media%>/downloads.svg');" />
+
+			<input type="img" src="<%=media%>/photo.svg" value="Social" alt="Social" onclick="insertText('icon', '<%=media%>/photo.svg');" />
+			<input type="img" src="<%=media%>/internet.svg" value="Internet" alt="Internet" onclick="insertText('icon', '<%=media%>/internet.svg');" />
+			<input type="img" src="<%=media%>/write.svg" value="Writing" alt="Writing" onclick="insertText('icon', '<%=media%>/write.svg');" />
+			<input type="img" src="<%=media%>/audio.svg" value="Audio" alt="Audio onclick="insertText('icon', '<%=media%>/audio.svg');" />
+
+			<input type="img" src="<%=media%>/calendar.svg" value="Calendar" onclick="insertText('icon', '<%=media%>/calendar.svg');" />
+			<input type="img" src="<%=media%>/calendar.svg" value="Default" onclick="insertText('icon', '<%=media%>/commotion-faded2.png');" />
+
+		</div>
+
     </div>
     <% if page.type == "edit" then %>
       <div class="cbi-value">
@@ -62,7 +92,7 @@
           <option value="1"<% if (app.approved == "1") then %> selected<% end %>>approved</option>
           <option value="0"<% if (app.approved == "0") then %> selected<% end %>>blacklisted</option>
           </select>
-          <div class="cbi-value-description">Approved applications are shown to users, while blacklisted applications are not.</div>
+          <div class="cbi-value-description">Approved applications are shown to users, while blacklisted applications are not. All applications are approved automatically.</div>
         </div>
       </div>
     <% end %>
@@ -70,6 +100,11 @@
     <h5 id="apps_advanced"><a href="javascript:void(0);">Advanced Options</a></h5>
     <fieldset>
     <div id="advanced_options">
+
+	  <div class="cbi-value">
+		<label class="cbi-value-title" data-tip="Displays a custom icon based on the application's Serval fingerprint.">Use custom</label>
+	  </div>
+
       <div class="cbi-value">
         <label class="cbi-value-title" data-tip="The port of the application or a web page describing how to connect to the application.">Port of Service (Optional):</label>
         <div class="cbi-value-field">
@@ -78,7 +113,7 @@
   	  <div class="cbi-value-description">If no port is given, it will default to port 80.</div>
         </div>
       </div>
-      <div class="cbi-value">                                                                                                                                             
+      <div class="cbi-value">
         <label class="cbi-value-title" data-tip="If the number of hops is greater than zero, the application will be visible from other Commotion nodes in the network. Otherwise, it will only be seen on this node.">Number of hops away this service should be seen (Optional):</label>
         <div class="cbi-value-field">
           <input type="text" name="ttl" <% if app then %>value="<%=app.ttl%>"<% end %>/>
