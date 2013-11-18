@@ -509,7 +509,7 @@ ${app_types}
 		  name = values.name,
 		  type = service_type,
 		  uri = values.uri,
-		  port = values.port,
+		  port = values.port and values.port or 0,
 		  icon = values.icon,
 		  description = values.description,
 		  ttl = values.ttl,
