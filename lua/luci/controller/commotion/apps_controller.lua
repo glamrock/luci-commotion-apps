@@ -509,7 +509,7 @@ ${app_types}
 		  name = values.name,
 		  type = service_type,
 		  uri = values.uri,
-		  port = values.port and values.port or 0,
+		  port = values.port ~= '' and values.port or 0,
 		  icon = values.icon,
 		  description = values.description,
 		  ttl = values.ttl,
@@ -549,7 +549,7 @@ ${app_types}
 			service_file:write(service_string)
 			service_file:flush()
 			service_file:close()
-			luci.sys.exec("/etc/init.d/avahi-daemon restart")
+			luci.sys.exec("kill -s HUP $(pgrep avahi-daemon)")
 		else
 			dispatch.error500("Failed to create avahi service file")
 			return
@@ -566,7 +566,7 @@ ${app_types}
 			dispatch.error500("Error removing Avahi service file")
 			return
 		end
-		luci.sys.exec("/etc/init.d/avahi-daemon restart")
+		luci.sys.exec("kill -s HUP $(pgrep avahi-daemon)")
 	end
 	    
 	-- Commit everthing to UCI
