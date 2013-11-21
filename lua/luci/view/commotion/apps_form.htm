@@ -125,7 +125,7 @@
       <div class="cbi-value">
         <label class="cbi-value-title" data-tip="If this is checked, the application will not be removed from the applications list after the default expiration period.">Is this application permanent?</label>
         <div class="cbi-value-field">
-          <input type="checkbox" name="permanent" value="1" <% if app and app.permanent == "1" then %>checked<% end %>/>
+          <input type="checkbox" name="permanent" value="1" <% if app and app.permanent == "1" or not app then %>checked<% end %>/>
           <div class="cbi-value-description">If checked, application will not expire.</div>
 	</div>
       </div>
