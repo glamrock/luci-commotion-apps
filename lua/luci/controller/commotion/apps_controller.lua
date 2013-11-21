@@ -323,6 +323,9 @@ function action_add(edit_app)
 		else
 			values[i] = encode.url(field)
 		end
+		if values[i]:len() > 254 then
+			error_info[i] = "Value too long"
+		end
         end
 	
 	-- make sure application types are within the set of approved categories on node
@@ -374,7 +377,7 @@ function action_add(edit_app)
 		if (count and count ~= '' and tonumber(count) >= 100) then
 			error_info.notice = "This node cannot support any more applications at this time. Please contact the node administrator or try again later."
 		else
-			UUID = encode.uci(values.ipaddr .. values.port)
+			UUID = encode.uci(values.ipaddr .. values.port):sub(1,254)
 			values.uuid = UUID
 		
 			uci:foreach("applications", "application", 
@@ -424,11 +427,14 @@ function action_add(edit_app)
 				return
 			end
 			deleted_uci = 1
-			UUID = encode.uci(values.ipaddr .. values.port)
+			UUID = encode.uci(values.ipaddr .. values.port):sub(1,254)
 			values.uuid = UUID
 		else
 			UUID = luci.http.formvalue("uuid")
 			values.uuid = UUID
+			if UUID:len() > 254 then
+			  DIE("Invalid UUID length")
+			end
 		end
 	end
 	
