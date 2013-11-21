@@ -1,6 +1,9 @@
 <%+header%>
 
-<link rel="stylesheet" type="text/css" href="<%=media%>/apps.css" />
+<!-- <link rel="stylesheet" type="text/css" href="<%=media%>/apps.css" /> -->
+
+<link rel="stylesheet" type="text/css" href="../../../../luci-static/commotion/apps.css" />
+
 <script type="text/javascript" src="<%=media%>/apps_form.js"></script>
 <script>
 	// App icon selection
@@ -67,18 +70,18 @@
 		<div class="icon-choices">
 			<noscript>Please enable javascript to select one of these icons.</noscript>
 			<!-- divided into segments of four, since that's how they appear on the site -->
-			<input type="img" src="<%=media%>/code.svg" value="Programming" alt="Programming" onclick="insertText('icon', '<%=media%>/code.svg');" />
-			<input type="img" src="<%=media%>/chat.svg" value="Chat" alt="Chat" onclick="insertText('icon', '<%=media%>/chat.svg');" />
-			<input type="img" src="<%=media%>/email.svg" value="Email" alt="Email" onclick="insertText('icon', '<%=media%>/email.svg');" />
-			<input type="img" src="<%=media%>/downloads.svg" value="File Sharing" alt="File Sharing" onclick="insertText('icon', '<%=media%>/downloads.svg');" />
+			<input type="image" src="<%=media%>/code.svg" alt="Programming" onclick="insertText('icon', '<%=media%>/code.svg');" />
+			<input type="image" src="<%=media%>/chat.svg" alt="Chat" onclick="insertText('icon', '<%=media%>/chat.svg');" />
+			<input type="image" src="<%=media%>/email.svg" alt="Email" onclick="insertText('icon', '<%=media%>/email.svg');" />
+			<input type="image" src="<%=media%>/downloads.svg" alt="File Sharing" onclick="insertText('icon', '<%=media%>/downloads.svg');" />
 
-			<input type="img" src="<%=media%>/photo.svg" value="Social" alt="Social" onclick="insertText('icon', '<%=media%>/photo.svg');" />
-			<input type="img" src="<%=media%>/internet.svg" value="Internet" alt="Internet" onclick="insertText('icon', '<%=media%>/internet.svg');" />
-			<input type="img" src="<%=media%>/write.svg" value="Writing" alt="Writing" onclick="insertText('icon', '<%=media%>/write.svg');" />
-			<input type="img" src="<%=media%>/audio.svg" value="Audio" alt="Audio onclick="insertText('icon', '<%=media%>/audio.svg');" />
+			<input type="image" src="<%=media%>/photo.svg" alt="Social" onclick="insertText('icon', '<%=media%>/photo.svg');" />
+			<input type="image" src="<%=media%>/internet.svg" alt="Internet" onclick="insertText('icon', '<%=media%>/internet.svg');" />
+			<input type="image" src="<%=media%>/write.svg" alt="Writing" onclick="insertText('icon', '<%=media%>/write.svg');" />
+			<input type="image" src="<%=media%>/audio.svg" alt="Audio" onclick="insertText('icon', '<%=media%>/audio.svg');" />
 
-			<input type="img" src="<%=media%>/calendar.svg" value="Calendar" onclick="insertText('icon', '<%=media%>/calendar.svg');" />
-			<input type="img" src="<%=media%>/calendar.svg" value="Default" onclick="insertText('icon', '<%=media%>/commotion-faded2.png');" />
+			<input type="image" src="<%=media%>/calendar.svg" onclick="insertText('icon', '<%=media%>/calendar.svg');" />
+			<input type="image" src="<%=media%>/commotion-faded2.png');" onclick="insertText('icon', '<%=media%>/commotion-faded2.png');" />
 
 		</div>
 
