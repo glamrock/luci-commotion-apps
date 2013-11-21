@@ -114,11 +114,11 @@
         </div>
       </div>
       <div class="cbi-value">
-        <label class="cbi-value-title" data-tip="<%:If the number of hops is greater than zero, the application will be visible from other Commotion nodes in the network. Otherwise, it will only be seen on this node%>."><%:Number of hops away this service should be seen (Optional)%>:</label>
+        <label class="cbi-value-title" data-tip="<%:If the number of hops is greater than zero, the application will be visible from other Commotion nodes in the network. Otherwise, it will only be seen on this node %>."><%:Number of hops away this service should be seen (Optional)%>:</label>
         <div class="cbi-value-field">
           <input type="text" name="ttl" <%- if app then -%>value="<%=app.ttl-%>"<%- else -%>value="5"<%- end -%> />
           <%if err then%><div class="error"><%=err.ttl%></div><%end%>
-          <div class="cbi-value-description"><%How many nodes away your application will be seen. Defaults to 5 hops away%>.</div>
+          <div class="cbi-value-description"><%:How many nodes away your application will be seen. Defaults to 5 hops away%>.</div>
         </div> 
       </div>
       <% if page.allowpermanent == "1" then %>
