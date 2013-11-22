@@ -5,12 +5,15 @@
 <script type="text/javascript" src="<%=media%>/apps_form.js"></script>
 <script>
 	// App icon selection
-      function insertText(elemID, text)
-      {
-        var elem = document.getElementById(elemID);
-        elem.innerHTML += text;
-      }
-    </script>
+	function appicon(image) {
+	   var Field = document.getElementById('icon');
+	   var val = Field.value;
+	   var selected_txt = val.substring(Field.selectionStart, Field.selectionEnd);
+	   var before_txt = val.substring(0, Field.selectionStart);
+	   var after_txt = val.substring(Field.selectionEnd, val.length);
+	   Field.value = image;
+	}
+</script>
 
 <h2><a id="content" name="content">
   <% if page.type == "add" then %>
@@ -62,25 +65,23 @@
 
   	<input type="text" name="icon" id="icon" <% if app then %>value="<%=app.icon%>" <% else %>value="<%=media%>/commotion-faded.png"<% end %>/>
   	<%if err then%><div class="error"><%=err.icon%></div><%end%>
-  	<div class="cbi-value-description">This should be a URL of an image file that will be displayed next to the listing of your application.</div>
-      </div>
 
+	<div class="cbi-value-description">This should be a URL of an image file that will be displayed next to the listing of your application.</div>
 		<div class="icon-choices">
 			<noscript>Please enable javascript to select one of these icons.</noscript>
 			<!-- divided into segments of four, since that's how they appear on the site -->
-			<input type="image" src="<%=media%>/code.svg" alt="Programming" onclick="insertText('icon', '<%=media%>/code.svg');" />
-			<input type="image" src="<%=media%>/chat.svg" alt="Chat" onclick="insertText('icon', '<%=media%>/chat.svg');" />
-			<input type="image" src="<%=media%>/email.svg" alt="Email" onclick="insertText('icon', '<%=media%>/email.svg');" />
-			<input type="image" src="<%=media%>/downloads.svg" alt="File Sharing" onclick="insertText('icon', '<%=media%>/downloads.svg');" />
+			<input type="button" class="appcode" onclick="appicon ('<%=media%>/code.svg');" />
+			<input type="button" class="appchat" onclick="appicon ('<%=media%>/chat.svg');" />
+			<input type="button" class="appemail" onclick="appicon ('<%=media%>/email.svg');" />
+			<input type="button" class="appdl" onclick="appicon ('<%=media%>/downloads.svg');" />
 
-			<input type="image" src="<%=media%>/photo.svg" alt="Social" onclick="insertText('icon', '<%=media%>/photo.svg');" />
-			<input type="image" src="<%=media%>/internet.svg" alt="Internet" onclick="insertText('icon', '<%=media%>/internet.svg');" />
-			<input type="image" src="<%=media%>/write.svg" alt="Writing" onclick="insertText('icon', '<%=media%>/write.svg');" />
-			<input type="image" src="<%=media%>/audio.svg" alt="Audio" onclick="insertText('icon', '<%=media%>/audio.svg');" />
+			<input type="button" class="appphoto" onclick="appicon ('<%=media%>/photo.svg');" />
+			<input type="button" class="appnet" onclick="appicon ('<%=media%>/internet.svg');" />
+			<input type="button" class="appwrite" onclick="appicon ('<%=media%>/write.svg');" />
+			<input type="button" class="appaudio" onclick="appicon ('<%=media%>/audio.svg');" />
 
-			<input type="image" src="<%=media%>/calendar.svg" onclick="insertText('icon', '<%=media%>/calendar.svg');" />
-			<input type="image" src="<%=media%>/commotion-faded2.png');" onclick="insertText('icon', '<%=media%>/commotion-faded2.png');" />
-
+			<input type="button" class="appcal" onclick="appicon ('<%=media%>/calendar.svg');" />
+			<input type="button" class="appfaded" onclick="appicon ('<%=media%>/commotion-faded2.png');" />
 		</div>
 
     </div>
