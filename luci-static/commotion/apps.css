@@ -95,53 +95,53 @@ text-align:right;
 	box-shadow:         0px 0px 5px rgba(221, 221, 221, 1);
 }
 
-input.appcode { 
-   background-image: url(<%=media%>/code.svg);
+input#appcode { 
+   background-image: url(/luci-static/commotion/code.svg);
    background-size: cover;
 }
 
-input.appchat { 
-   background-image: url(<%=media%>/chat.svg);
+input#appchat { 
+   background-image: url(/luci-static/commotion/chat.svg);
    background-size: cover;
 }
 
-input.appemail { 
-   background-image: url(<%=media%>/email.svg);
+input#appemail { 
+   background-image: url(/luci-static/commotion/email.svg);
    background-size: cover;
 }
 
-input.appdl { 
-   background-image: url(<%=media%>/downloads.svg);
+input#appdl { 
+   background-image: url(/luci-static/commotion/downloads.svg);
    background-size: cover;
 }
 
-input.appphoto { 
-   background-image: url(<%=media%>/photo.svg);
+input#appphoto { 
+   background-image: url(/luci-static/commotion/photo.svg);
    background-size: cover;
 }
 
-input.appnet { 
-   background-image: url(<%=media%>/internet.svg);
+input#appnet { 
+   background-image: url(/luci-static/commotion/internet.svg);
    background-size: cover;
 }
 
-input.appwrite { 
-   background-image: url(<%=media%>/write.svg);
+input#appwrite { 
+   background-image: url(/luci-static/commotion/write.svg);
    background-size: cover;
 }
 
-input.appaudio { 
-   background-image: url(<%=media%>/audio.svg);
+input#appaudio { 
+   background-image: url(/luci-static/commotion/audio.svg);
    background-size: cover;
 }
 
-input.appcal { 
-   background-image: url(<%=media%>/calendar.svg);
+input#appcal { 
+   background-image: url(/luci-static/commotion/calendar.svg);
    background-size: cover;
 }
 
-input.appfaded { 
-   background: url(<%=media%>/commotion-faded2.png);
+input#appfaded { 
+   background: url(/luci-static/commotion/commotion-faded2.png);
    background-size: cover;
 }
 
