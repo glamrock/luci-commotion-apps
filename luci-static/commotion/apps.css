@@ -96,55 +96,58 @@ text-align:right;
 }
 
 input#appcode { 
-   background-image: url(/luci-static/commotion/code.svg);
+   background-image: url(/luci-static/commotion/code.png);
    background-size: cover;
 }
 
 input#appchat { 
-   background-image: url(/luci-static/commotion/chat.svg);
+   background-image: url(/luci-static/commotion/chat.png);
    background-size: cover;
 }
 
 input#appemail { 
-   background-image: url(/luci-static/commotion/email.svg);
+   background-image: url(/luci-static/commotion/email.png);
    background-size: cover;
 }
 
 input#appdl { 
-   background-image: url(/luci-static/commotion/downloads.svg);
+   background-image: url(/luci-static/commotion/downloads.png);
    background-size: cover;
 }
 
 input#appphoto { 
-   background-image: url(/luci-static/commotion/photo.svg);
+   background-image: url(/luci-static/commotion/photo.png);
    background-size: cover;
 }
 
 input#appnet { 
-   background-image: url(/luci-static/commotion/internet.svg);
+   background-image: url(/luci-static/commotion/internet.png);
    background-size: cover;
 }
 
 input#appwrite { 
-   background-image: url(/luci-static/commotion/write.svg);
+   background-image: url(/luci-static/commotion/write.png);
    background-size: cover;
 }
 
 input#appaudio { 
-   background-image: url(/luci-static/commotion/audio.svg);
+   background-image: url(/luci-static/commotion/audio.png);
    background-size: cover;
 }
 
 input#appcal { 
-   background-image: url(/luci-static/commotion/calendar.svg);
+   background-image: url(/luci-static/commotion/calendar.png);
    background-size: cover;
 }
 
 input#appfaded { 
-   background: url(/luci-static/commotion/commotion-faded2.png);
+   background-image: url(/luci-static/commotion/commotion-faded2.png);
    background-size: cover;
 }
 
+.icon-choices input[type="button"]:hover {
+  background: #ffadc6;
+}
 
 .signature, .colorprint { font-family: "Courier New"; font-weight:bold; font-size: 14px; }
 
