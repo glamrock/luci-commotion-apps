@@ -6,7 +6,7 @@
     end
   end
 -%>
-<div class="app <%=this_app.uuid%> <%=approved%>">
+<div class="app <%=this_app.uuid%>">
   <div class="app-inner">
 	<img src="<% if not this_app.icon:match("^[a-z]+://") then %><% end %><%=this_app.icon%>"  align="Left" width="85" height="85">
 	<div class="name">
@@ -45,7 +45,7 @@
 	<% end %>
 	<% if (admin_vars) then %>
 	  <button class="approve" onclick="return JudgeApp('<%=this_app.uuid%>',1)">Approve</button>
-	  <button class="blacklist" onclick="return JudgeApp('<%=this_app.uuid%>',0)">Blacklist</button>
+	  <button class="banned" onclick="return JudgeApp('<%=this_app.uuid%>',0)">Banned</button>
 	  <% if (this_app.localapp) then %> <a class="edit" href="apps/edit?uuid=<%=this_app.uuid%>">Edit</a><%end%>
 	<% end %>
   </div>

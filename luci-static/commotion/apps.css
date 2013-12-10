@@ -1,5 +1,4 @@
 .apps {
-border:2px dashed #ff6699;
 margin-top:8px;
 }
 
@@ -51,7 +50,7 @@ text-align:right;
 }
 
 .name h4 { display:inline-block; color:#000000; }
-.app-tooltip { 
+.app-tooltip {
 	display:none; 
 	background:#ffffff; 
 	border: 1px #DDDDDD solid;

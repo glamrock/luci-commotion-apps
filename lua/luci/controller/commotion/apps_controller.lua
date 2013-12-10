@@ -1,4 +1,20 @@
+--[[
+   Copyright (C) 2012 Dan Staples <danstaples@opentechinstitute.org>
+   "with great annoyance provided by Seamus Tuohy"
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+]]--
 module("luci.controller.commotion.apps_controller", package.seeall)
 
 require "luci.model.uci"
@@ -8,18 +24,31 @@ require "luci.fs"
 
 function index()
   local uci = luci.model.uci.cursor()
+
+  --settings and menu-title always stay if installed.
+  entry({"admin", "commotion", "apps", "settings"}, call("admin_edit_settings"), translate("Settings"), 450).subsection=true
+
+  --remove all other menu's if not installed
   if uci:get("applications","settings","disabled") == "0" then
-    entry({"commotion", "index", "apps"}, call("load_apps"), "Local Applications", 20).dependent=true
+	 entry({"admin", "commotion", "apps"}, alias("admin", "commotion", "apps", "list"), translate("Applications"), 30).index = true
+	 --public facing sections
     entry({"apps"}, call("load_apps"), "Local Applications", 20).dependent=true
-    entry({"admin","commotion","apps"}, call("admin_load_apps"), "Local Applications", 50).dependent=true
-    --entry({"admin", "commotion", "apps", "list"}, cbi("commotion/apps_cbi")).dependent=true
-    entry({"apps", "add"}, call("add_app")).dependent=true
-    entry({"apps", "add_submit"}, call("action_add")).dependent=true
-    entry({"admin", "commotion", "apps", "edit"}, call("admin_edit_app")).dependent=true
-    entry({"admin", "commotion", "apps", "edit_submit"}, call("action_edit")).dependent=true
-    entry({"admin", "commotion", "apps", "settings"}, call("admin_edit_settings")).dependent=true
-    entry({"admin", "commotion", "apps", "settings_submit"}, call("action_settings")).dependent=true
-    entry({"admin", "commotion", "apps", "judge"}, call("judge_app")).dependent=true
+	entry({"commotion", "index", "apps"}, call("load_apps"), translate("Local Applications"), 20).dependent=true
+	entry({"apps", "add"}, call("add_app")).dependent=true
+	entry({"apps", "add_submit"}, call("action_add")).dependent=true
+
+	--menu based sections
+    entry({"admin","commotion","apps", "list"}, call("load_apps", {true}), translate("List"), 40).subsection=true
+	entry({"admin", "commotion", "apps", "add"}, call("add_app"), translate("Add"), 50).subsection=true
+
+	--Special pages for functions
+    entry({"admin", "commotion", "apps", "edit"}, call("admin_edit_app")).hidden=true
+    entry({"admin", "commotion", "apps", "edit_submit"}, call("action_edit")).hidden=true
+    entry({"admin", "commotion", "apps", "settings_submit"}, call("action_settings")).hidden=true
+    entry({"admin", "commotion", "apps", "list", "judge"}, call("judge_app")).hidden=true
+	entry({"admin", "commotion", "apps", "judge"}, call("judge_app")).hidden=true
+  else
+	 entry({"admin", "commotion", "apps"}, alias("admin", "commotion", "apps", "settings"), translate("Applications"), 30).index = true
   end
 end
 
@@ -41,7 +70,7 @@ function judge_app()
   end
   if (uci:set("applications", app_id, "approved", approved) and 
     uci:set("applications", "known_apps", "known_apps") and
-    uci:set("applications", "known_apps", app_id, (approved == "1") and "approved" or "blacklisted") and
+    uci:set("applications", "known_apps", app_id, (approved == "1") and "approved" or "banned") and
     uci:save('applications') and 
     uci:commit('applications')) then
   	luci.http.status(200, "OK")
@@ -50,43 +79,27 @@ function judge_app()
   end
 end
 
-function admin_load_apps()
-	load_apps({true})
-end
-
 function action_edit()
 	action_add({true})
 end
 
 function load_apps(admin_vars)
 	local uuid, app
-	local uci = luci.model.uci.cursor()
-	local categories = {}
-	local apps = {}
+	local uci = require "luci.model.uci".cursor()
+	local categories = {banned={}, approved={}, new={}}
 	
-	uci:foreach("applications", "application", function(app)
-		if app.uuid then
-			if admin_vars then
-				table.insert(apps,app)
-			else
-				if app.approved and app.approved == '1' then
-					table.insert(apps,app)
-				end
-			end
-		end 
-	end)
-
-	for _, app in pairs(apps) do
-		if app.type then
-			for _, t in pairs(app.type) do
-				if not categories[t] then categories[t] = {} end
-				categories[t][app.uuid] = app
-			end
-		else 
-			if not categories.misc then categories.misc = {} end
-			categories.misc[app.uuid] = app
-		end
-	end
+	uci:foreach("applications", "application",
+				function(app)
+				   if app.uuid then
+					  if app.approved and app.approved == '1' then
+						 categories.approved[app.uuid] = app
+					  elseif app.approved and admin_vars then
+						 categories.banned[app.uuid] = app
+					  elseif admin_vars then
+						 categories.new[app.uuid] = app
+					  end
+				   end
+				end)
 	luci.template.render("commotion/apps_view", {categories=categories, admin_vars=admin_vars})
 end
 
