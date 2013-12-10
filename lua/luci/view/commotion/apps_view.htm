@@ -10,6 +10,10 @@
 <div class="cbi-map-descr"><%:Here you can view applications accessible from this node%>.</div>
 <% end %>
 <div class="cbi-map">
-  <% include ("commotion/apps_display") %>
+  <% if admin_vars then
+	     include ("commotion/apps_admin_display")
+	 else
+	     include ("commotion/apps_display")
+	 end%>
 </div>
 <%+footer%>

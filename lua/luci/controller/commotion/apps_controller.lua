@@ -86,17 +86,30 @@ end
 function load_apps(admin_vars)
 	local uuid, app
 	local uci = require "luci.model.uci".cursor()
-	local categories = {banned={}, approved={}, new={}}
+	local categories = {}
+	if admin_vars then
+	   categories = {banned={}, approved={}, new={}}
+	end
 	
 	uci:foreach("applications", "application",
 				function(app)
-				   if app.uuid then
+				   if app.uuid and admin_vars then
 					  if app.approved and app.approved == '1' then
 						 categories.approved[app.uuid] = app
-					  elseif app.approved and admin_vars then
+					  elseif app.approved then
 						 categories.banned[app.uuid] = app
-					  elseif admin_vars then
+					  else
 						 categories.new[app.uuid] = app
+					  end
+				   else
+					  if app.type and app.approved and app.approved == '1' then
+						 for _, t in pairs(app.type) do
+							if not categories[t] then categories[t] = {} end
+							categories[t][app.uuid] = app
+						 end
+					  else 
+						 if not categories.misc then categories.misc = {} end
+						 categories.misc[app.uuid] = app
 					  end
 				   end
 				end)
