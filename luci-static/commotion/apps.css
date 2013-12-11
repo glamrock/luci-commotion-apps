@@ -151,10 +151,10 @@ input#appfaded {
 .signature, .colorprint { font-family: "Courier New"; font-weight:bold; font-size: 14px; }
 
 button.approve { background: url("check.png") no-repeat left center; }
-button.blacklist {background: url("x.png") no-repeat left center; }
+button.banned {background: url("x.png") no-repeat left center; }
 a.edit {background: url("equals.png") no-repeat left center; padding:10px 0 10px 40px;}
 
-button.approve, button.blacklist, a.edit {
+button.approve, button.banned, a.edit {
 color:#FF6699;
 font-weight:bold;
 height:36px;
@@ -176,5 +176,13 @@ fieldset legend { padding-top:0; }
   height: 100%;
   top: 5px;
   right: 5px;
+}
+
+.app-type {
+	text-align:right;
+	margin-right:95px;
+	color:#FF6699;
+	font-size:13px;
+	font-style:italic;
 }
 

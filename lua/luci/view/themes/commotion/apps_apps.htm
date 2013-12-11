@@ -46,7 +46,14 @@
 	<% if (admin_vars) then %>
 	  <button class="approve" onclick="return JudgeApp('<%=this_app.uuid%>',1)">Approve</button>
 	  <button class="banned" onclick="return JudgeApp('<%=this_app.uuid%>',0)">Banned</button>
-	  <% if (this_app.localapp) then %> <a class="edit" href="apps/edit?uuid=<%=this_app.uuid%>">Edit</a><%end%>
-	<% end %>
+	    <% if (this_app.localapp) then %>
+	        <a class="edit" href="apps/edit?uuid=<%=this_app.uuid%>">Edit</a>
+	    <%end%>
+	<%end%>
+	<div class="app-type">
+	<% for _,i in pairs(this_app.type) do %>
+	    <%=i.." "%>
+	<%end%>
+	</div>
   </div>
 </div>
