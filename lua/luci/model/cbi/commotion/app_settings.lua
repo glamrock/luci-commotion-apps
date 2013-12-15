@@ -1,9 +1,9 @@
 local ccbi = require "luci.commotion.ccbi"
 local db = require "luci.commotion.debugger"
-local cdisp = require "luci.commotion.dispatch"
+local ccbi = require "luci.commotion.ccbi"
 
 local m = Map("applications", translate("Application Settings"), translate("Change settings for applications publicly announced by this node."))
-m.on_after_save = cdisp.conf_page
+m.on_after_save = ccbi.conf_page
 
 
 s = m:section(TypedSection, "settings", translate("Categories"))
