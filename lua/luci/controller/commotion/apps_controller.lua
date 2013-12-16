@@ -27,7 +27,7 @@ function index()
   enabled = uci:get("applications", "settings", "disabled")
   
   --settings and menu-title always stay if installed.
-	 entry({"admin", "commotion", "apps"}, alias("admin", "commotion", "apps", "settings"), translate("Applications"), 30)
+	 entry({"admin", "commotion", "apps"}, alias("admin", "commotion", "apps", "list"), translate("Applications"), 30)
   entry({"admin", "commotion", "apps", "settings"}, cbi("commotion/app_settings", {hideapplybtn=true, hideresetbtn=true}), translate("Settings"), 50).subsection=true
 
  --remove all other menu's if not installed
