@@ -24,15 +24,17 @@ Applications are advertised on a Commotion mesh network using Avahi/mDNS. Each a
         <domain-name>mesh.local</domain-name>
         <!--<host-name>%h.mesh.local</host-name>--> <!-- DON'T set hostname, because avahi will fail to resolve it when using mesh.local domain-->
         <port>443</port> <!--optional-->
-        <txt-record>application=Example Application</txt-record>
+        <txt-record>name=Example Application</txt-record>
         <txt-record>ttl=2</txt-record> <!--optional: how many hops away the service should be advertised-->
-        <txt-record>ipaddr=https://commotionwireless.net</txt-record> <!-- IP address or URL of service host -->
+        <txt-record>uri=https://commotionwireless.net</txt-record> <!-- IP address or URL of service host -->
         <txt-record>type=collaboration</txt-record>
         <txt-record>type=circumvention</txt-record> <!-- each type should have its own txt-record -->
         <txt-record>fingerprint=FA7E03D576F9A6752194CFCBE402C455B7F0F8C8894F7C05F17ECE500D2DC648</txt-record>
         <txt-record>signature=E07B1282AE1601C334CEA861DF795D57D00603BA00D97F382720F4146DDCD4427973D171C89BCA0EAAF1D72E9EF0DB2367CE07BBFFF6FF27FF01F1DFBEB65D0B</txt-record>
         <txt-record>icon=https://exampleapplication.com/icon.png</txt-record>
         <txt-record>description=Commotion is an open-source communication tool that uses mobile phones, computers, and other wireless devices to create decentralized mesh networks.</txt-record>
+        <txt-record>lifetime=86400</txt-record>
+        <txt-record>version=1.0</txt-record>
         
       </service>
     </service-group>
