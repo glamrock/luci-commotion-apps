@@ -35,8 +35,11 @@ function index()
 	 --public facing sections
 	 entry({"apps"}, call("load_apps"), translate("Local Applications")).dependent=true
 	 entry({"commotion", "index", "apps"}, call("load_apps"), translate("Local Applications"), 20).dependent=true
-	 entry({"apps", "add"}, call("add_app")).dependent=true
-   entry({"apps", "add_submit"}, call("action_add")).dependent=true 
+	 local unauth = uci:get("applications", "settings", "enable_unauth")
+	 if unauth == "1" then
+		entry({"apps", "add"}, call("add_app")).dependent=true
+		entry({"apps", "add_submit"}, call("action_add")).dependent=true
+	 end
 
 	 --menu based sections
 	 entry({"admin","commotion","apps", "list"}, call("load_apps", {true}), translate("List"), 40).subsection=true

@@ -60,5 +60,10 @@ chk_conn.remove=ccbi.flag_off
 chk_conn.write=ccbi.flag_write
 chk_conn.optional = false
 
+allow_anon = s:option(Flag, "enable_unauth", translate("Allow users to add application advertisements from your access point."), translate("If “Yes” is selected here, any user on your device can add an application from the view apps mainpage. Select “No” to disable this option If you would like to require administrator access to add advertisements."))
+allow_anon.remove=ccbi.flag_off
+allow_anon.write=ccbi.flag_write
+allow_anon.optional = false
+
 return m
 
