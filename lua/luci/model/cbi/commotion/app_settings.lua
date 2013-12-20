@@ -15,12 +15,12 @@ expire.remove=ccbi.flag_off
 expire.write=ccbi.flag_write
 expire.optional = false
 
-ex_time_num = s:option(Value, "expiration", translate("Time before applications expire"))
+ex_time_num = s:option(Value, "lifetime", translate("Time before applications expire"))
 ex_time_num:depends("allowpermanent","1")
 ex_time_num.forcewrite = true --This is required for a modification of the unit to cause a change in the number.
 
 --! ex_time_num.write
---! @brief Multiple the expiration time by the unit chosen to modify it to seconds.
+--! @brief Multiple the lifetime by the unit chosen to modify it to seconds.
 function ex_time_num.write(self, section, value)
    local units = {seconds=1, minutes=60, hours=3600, days=86400}
    local unit = ex_time_units:formvalue(section)
