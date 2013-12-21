@@ -40,6 +40,8 @@ function index()
 		entry({"apps", "add"}, call("add_app")).dependent=true
 		entry({"apps", "add_submit"}, call("action_add")).dependent=true
 	 end
+	 entry({"admin", "commotion", "apps", "add_submit"}, call("action_add")).dependent=true
+
 
 	 --menu based sections
 	 entry({"admin","commotion","apps", "list"}, call("load_apps", {true}), translate("List"), 40).subsection=true
