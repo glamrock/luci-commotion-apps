@@ -2,13 +2,15 @@
 <script type="text/javascript" src="<%=media%>/apps.js"></script>
 <script type="text/javascript" src="<%=media%>/patternizer.min.js"></script>
 <link rel="stylesheet" type="text/css" href="<%=media%>/apps.css" />
-<h2><a id="content" name="content"><%:Applications%></a></h2>
+<h2 class="appsH2"><a id="content" name="content"><%:Applications%></a></h2>
+<div class="cbi-map-descr apps-content">
 <% if admin_vars then %>
 <script type="text/javascript" src="<%=media%>/admin_apps.js"></script>
-<div class="cbi-map-descr"><%:Publicly announced applications running on this network are listed below.%></div>
+<%:Publicly announced applications running on this network are listed below.%>
 <%else%>
-<div class="cbi-map-descr"><%:Here you can view applications accessible from this node%>.</div>
+<%:Here you can view applications accessible from this node%>.
 <% end %>
+</div>
 <div class="cbi-map">
   <% if not admin_vars then
 	 uci = require "luci.model.uci".cursor()
