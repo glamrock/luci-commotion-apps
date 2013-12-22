@@ -1,9 +1,9 @@
 <%- 
   if this_app.fingerprint then
-    prints = {}
-    for color in this_app.fingerprint:gmatch(".....?.?") do
-      table.insert(prints, color)
-    end
+   prints = {}
+   for color in this_app.fingerprint:gmatch(".....?.?") do
+     table.insert(prints, color)
+   end
   end
 -%>
 <div class="app <%=this_app.uuid%>">
@@ -51,9 +51,10 @@
 	    <%end%>
 	<%end%>
 	<div class="app-type">
-	<% for _,i in pairs(this_app.type) do %>
+	<%if this_app.type then
+	   for _,i in pairs(this_app.type) do %>
 	    <%=i.." "%>
-	<%end%>
+	<%end end%>
 	</div>
   </div>
 </div>
