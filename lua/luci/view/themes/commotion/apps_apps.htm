@@ -1,6 +1,7 @@
 <%- 
   if this_app.fingerprint then
    prints = {}
+   luci.commotion.debugger.log(this_app.fingerprint)
    for color in this_app.fingerprint:gmatch(".....?.?") do
      table.insert(prints, color)
    end
@@ -47,7 +48,7 @@
 	  <button class="approve" onclick="return JudgeApp('<%=this_app.uuid%>',1)">Approve</button>
 	  <button class="banned" onclick="return JudgeApp('<%=this_app.uuid%>',0)">Banned</button>
 	    <% if (this_app.localapp) then %>
-	        <a class="edit" href="apps/edit?uuid=<%=this_app.uuid%>">Edit</a>
+	        <a class="edit" href="edit?uuid=<%=this_app.uuid%>">Edit</a>
 	    <%end%>
 	<%end%>
 	<div class="app-type">
