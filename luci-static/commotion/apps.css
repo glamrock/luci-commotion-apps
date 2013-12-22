@@ -27,6 +27,10 @@ width:100%;
 margin:10px 0;
 }
 
+.apps-content {
+text-align:left;
+}
+
 a, a:focus { outline: 0; }
 
 .notice {
