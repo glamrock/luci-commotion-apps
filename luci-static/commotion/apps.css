@@ -26,9 +26,8 @@ background:#DDDDDD;
 width:100%;
 margin:10px 0;
 }
-
 .apps-content {
-text-align:left;
+  text-align:left;
 }
 
 a, a:focus { outline: 0; }
