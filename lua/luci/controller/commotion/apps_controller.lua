@@ -200,7 +200,7 @@ function admin_edit_app(error_info, bad_data)
 	  end
    end
    
-   luci.template.render("commotion/apps_form", {types_string=types_string, app=app_data, err=error_info, page={type="edit", action="/admin/commotion/apps/edit_submit", allowpermanent=allowpermanent}})
+   luci.template.render("commotion/apps_form", {types_string=types_string, app=app_data, err=error_info, page={type="edit", action="/apps/edit_submit", allowpermanent=allowpermanent}})
 end
 
 function action_add(edit_app)
