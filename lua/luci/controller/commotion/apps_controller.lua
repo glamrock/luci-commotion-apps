@@ -21,6 +21,7 @@ require "luci.model.uci"
 require "luci.http"
 require "luci.sys"
 require "luci.fs"
+local db  = require "luci.commotion.debugger"
 
 function index()
   local uci = luci.model.uci.cursor()
@@ -321,7 +322,18 @@ function action_add(edit_app)
 		 url_port = values.uri:match(":[0-9]+")
 		 url_port = url_port and url_port:gsub(":","") or ''
 	  end
-	  local connect = luci.sys.exec("nc -z -w 5 \"" .. cutil.pass_to_shell(url) .. '" "' .. ((url_port and url_port ~= "" and not error_info.port) and cutil.pass_to_shell(url_port) or "80") .. '"; echo $?')
+	  local curr_port = "80"
+	  if url_port and url_port ~= "" then
+		 if not error_info.port then
+			local parsed =  cutil.pass_to_shell(url_port)
+			if parsed == nil then
+			   curr_port = "80"
+			else
+			   curr_port = parsed
+			end
+		 end
+	  end
+	  local connect = luci.sys.exec("nc -z -w 5 \"" .. cutil.pass_to_shell(url) .. '" "' .. curr_port  .. '"; echo $?')
 	  if (connect:sub(-2,-2) ~= '0') then  -- exit status != 0 -> failed to resolve url
 		 error_info.uri = "Failed to resolve URL or connect to host"
 	  end

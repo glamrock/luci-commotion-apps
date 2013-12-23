@@ -25,10 +25,10 @@
 <% if err and err.notice ~= "" then %><div class="notice"><%=err.notice%></div><% end %>
 
 <%
-   if string.match(REQUEST_URI, "/admin/") and not string.match(REQUEST_URI, "edit") then
-   admin = "/admin/commotion"
+   if string.match(REQUEST_URI, "/admin/") then
+     admin = "/admin/commotion"
    else
-   admin = nil
+     admin = nil
    end
 %>
 
