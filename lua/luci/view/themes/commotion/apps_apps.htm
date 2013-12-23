@@ -1,7 +1,6 @@
 <%- 
   if this_app.fingerprint then
    prints = {}
-   luci.commotion.debugger.log(this_app.fingerprint)
    for color in this_app.fingerprint:gmatch(".....?.?") do
      table.insert(prints, color)
    end
