@@ -12,7 +12,6 @@
 		this_app = app
 	        if this_app.uuid then
 			this_app.description = this_app.description:gsub("&#13;&#10;","<br>")
-			this_app.hashtag = '#' .. this_app.name:gsub(" ","_"):gsub("[^%w_]",""):match("%a+[%w_]+%a")
     -%>
 			<% include("themes/" .. theme .. "/apps_apps") %>
 		<%end%>
