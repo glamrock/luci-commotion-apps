@@ -11,12 +11,15 @@ s = m:section(TypedSection, "settings", translate("Categories"))
 categories = s:option(DynamicList, "category")
 categories.optional = false
 expire = s:option(Flag, "allowpermanent", translate("Force local applications to expire? Yes/No"), translate("By default, all applications expire after a time period you specify. Un-check this box if applications should not expire."))
+expire.enabled = "0"
+expire.disabled = "1"
+expire.default = expire.disabled
 expire.remove=ccbi.flag_off
 expire.write=ccbi.flag_write
 expire.optional = false
 
 ex_time_num = s:option(Value, "lifetime", translate("Time before applications expire"))
-ex_time_num:depends("allowpermanent","1")
+ex_time_num:depends("allowpermanent","0")
 ex_time_num.forcewrite = true --This is required for a modification of the unit to cause a change in the number.
 
 --! ex_time_num.write
@@ -47,7 +50,7 @@ ex_time_units:value("seconds")
 ex_time_units:value("minutes")
 ex_time_units:value("hours")
 ex_time_units:value("days")
-ex_time_units:depends("allowpermanent","1")
+ex_time_units:depends("allowpermanent","0")
 function ex_time_units.write() return true end
 
 apprv = s:option(Flag, "autoapprove", translate("Automatically approve all publicly announced applications on this network"))
