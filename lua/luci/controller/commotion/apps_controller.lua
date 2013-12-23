@@ -496,6 +496,7 @@ ${app_types}
 	  
 	  -- Create Serval identity keypair for service, then sign service advertisement with it
 	  signing_msg = cutil.tprintf(signing_tmpl,fields)
+	  fields.signature = luci.sys.exec("serval-client id self"):match('^[A-F0-9]+')
 	  if (luci.http.formvalue("fingerprint") and id.is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
 		 resp = luci.sys.exec("commotion serval-crypto sign " .. luci.http.formvalue("fingerprint") .. " \"" .. cutil.pass_to_shell(signing_msg) .. "\"")
 	  else
@@ -503,14 +504,14 @@ ${app_types}
 			dispatch.error500("Unable to remove old UCI entry")
 			return
 		 end
-		 resp = luci.sys.exec("commotion serval-crypto sign $(serval-client id self) \"" .. cutil.pass_to_shell(signing_msg) .. "\"")
+		 resp = luci.sys.exec("commotion serval-crypto sign " .. fields.signature .. " \"" .. cutil.pass_to_shell(signing_msg) .. "\"")
 	  end
 	  if (luci.sys.exec("echo $?") ~= '0\n' or resp == '') then
 		 dispatch.error500("Failed to sign service advertisement")
 		 return
 	  end
 	  
-	  _,_,fields.signature,fields.fingerprint = resp:find('([A-F0-9]+)\r?\n?([A-F0-9]+)')
+	  _,_,fields.fingerprint = resp:find('([A-F0-9]+)')
 	  -- UUID = fields.fingerprint  -- not for single-key node
 	  values.fingerprint = fields.fingerprint
 	  values.signature = fields.signature
