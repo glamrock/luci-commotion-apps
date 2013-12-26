@@ -527,7 +527,7 @@ ${app_types}
 		 service_file:write(service_string)
 		 service_file:flush()
 		 service_file:close()
-		 luci.sys.exec("kill -s HUP $(pgrep avahi-daemon)")
+		 luci.sys.exec("/etc/init.d/avahi-daemon restart")
 	  else
 		 dispatch.error500("Failed to create avahi service file")
 		 return
@@ -544,7 +544,7 @@ ${app_types}
 			dispatch.error500("Error removing Avahi service file")
 			return
 		 end
-		 luci.sys.exec("kill -s HUP $(pgrep avahi-daemon)")
+		 luci.sys.exec("/etc/init.d/avahi-daemon restart")
    end
    
    -- Commit everthing to UCI
