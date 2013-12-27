@@ -84,7 +84,7 @@ function judge_app()
    else
 	  removed = uci:delete("applications", app_id)
 	  uci:save('applications') 
-	  uci:commit('applications'))
+	  uci:commit('applications')
 	  if removed then
 		 luci.http.status(200, "OK")
 	  else
