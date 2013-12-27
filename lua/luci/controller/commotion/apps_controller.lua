@@ -105,14 +105,9 @@ function load_apps(admin_vars)
 						categories.new[app.uuid] = app
 					 end
 				  else
-					 if app.type and app.approved and app.approved == '1' then
-						for _, t in pairs(app.type) do
-						   if not categories[t] then categories[t] = {} end
-						   categories[t][app.uuid] = app
-						end
-					 else 
-						if not categories.misc then categories.misc = {} end
-						categories.misc[app.uuid] = app
+					 if app.approved and app.approved == '1' then
+						if not categories.applications then categories.applications = {} end
+						categories.applications[app.uuid] = app
 					 end
 				  end
    end)
