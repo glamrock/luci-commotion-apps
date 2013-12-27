@@ -47,6 +47,7 @@
 	  <button class="approve" onclick="return JudgeApp('<%=this_app.uuid%>',1)">Approve</button>
 	  <button class="banned" onclick="return JudgeApp('<%=this_app.uuid%>',0)">Banned</button>
 	    <% if (this_app.localapp) then%>
+		<button class="delete" onclick="return JudgeApp('<%=this_app.uuid%>','delete')">Delete</button>
 	        <a class="edit" href="<%=controller%>/admin/commotion/apps/edit?uuid=<%=this_app.uuid%>">Edit</a>
 	    <%end%>
 	<%end%>

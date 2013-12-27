@@ -71,15 +71,32 @@ function judge_app()
 	  dispatch.error500("Application not found")
 	  return
    end
-   if (uci:set("applications", app_id, "approved", approved) and 
-		  uci:set("applications", "known_apps", "known_apps") and
-		  uci:set("applications", "known_apps", app_id, (approved == "1") and "approved" or "banned") and
-		  uci:save('applications') and 
-	   uci:commit('applications')) then
-	  luci.http.status(200, "OK")
-  else
-	 dispatch.error500("Could not judge app")
-   end
+   if approved ~= "delete" then
+	  if (uci:set("applications", app_id, "approved", approved) and 
+			 uci:set("applications", "known_apps", "known_apps") and
+			 uci:set("applications", "known_apps", app_id, (approved == "1") and "approved" or "banned") and
+			 uci:save('applications') and 
+		  uci:commit('applications')) then
+		 luci.http.status(200, "OK")
+	  else
+		 dispatch.error500("Could not judge app")
+	  end
+   else
+	  uci_removed = uci:delete("applications", app_id)
+	  uci:save('applications') 
+	  uci:commit('applications')
+	  if uci_removed then
+	         if luci.fs.isfile("/etc/avahi/services/" .. app_id .. ".service") then
+	              if (not luci.fs.unlink("/etc/avahi/services/" .. app_id .. ".service")) then
+		           dispatch.error500("Failed to delete Avahi service file")
+			   return
+	              end
+	         end
+	         luci.http.status(200, "OK")
+	  else
+		 dispatch.error500("Could not judge app")
+	  end
+	  end
 end
 
 function action_edit()
