@@ -87,7 +87,7 @@ function judge_app()
 	  uci:commit('applications')
 	  if uci_removed then
 	         if luci.fs.isfile("/etc/avahi/services/" .. app_id .. ".service") then
-	              if (luci.fs.unlink("/etc/avahi/services/" .. app_id .. ".service") ~= 0) then
+	              if (not luci.fs.unlink("/etc/avahi/services/" .. app_id .. ".service")) then
 		           dispatch.error500("Failed to delete Avahi service file")
 			   return
 	              end
