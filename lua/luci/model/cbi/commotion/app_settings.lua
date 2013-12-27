@@ -17,11 +17,11 @@ expire.default = expire.disabled
 expire.write=ccbi.flag_write
 expire.optional = false
 
-function expire.remove(self, section, fvalue)
+function expire.remove(self, section)
    value = self.map:get(section, self.option)
-   if value ~= fvalue then
+   if value ~= expire.disabled then
 	  self.section.changed = true
-	  return self.map:set(section, self.option, fvalue)
+	  return self.map:set(section, self.option, expire.disabled)
    end
 end
 
