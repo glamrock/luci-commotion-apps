@@ -71,14 +71,23 @@ function judge_app()
 	  dispatch.error500("Application not found")
 	  return
    end
-   if (uci:set("applications", app_id, "approved", approved) and 
-		  uci:set("applications", "known_apps", "known_apps") and
-		  uci:set("applications", "known_apps", app_id, (approved == "1") and "approved" or "banned") and
-		  uci:save('applications') and 
-	   uci:commit('applications')) then
-	  luci.http.status(200, "OK")
-  else
-	 dispatch.error500("Could not judge app")
+   if approved ~= "delete" then
+	  if (uci:set("applications", app_id, "approved", approved) and 
+			 uci:set("applications", "known_apps", "known_apps") and
+			 uci:set("applications", "known_apps", app_id, (approved == "1") and "approved" or "banned") and
+			 uci:save('applications') and 
+		  uci:commit('applications')) then
+		 luci.http.status(200, "OK")
+	  else
+		 dispatch.error500("Could not judge app")
+	  end
+   else
+	  removed = uci:delete("applications", app_id)
+	  if removed then
+		 luci.http.status(200, "OK")
+	  else
+		 dispatch.error500("Could not judge app")
+	  end
    end
 end
 
