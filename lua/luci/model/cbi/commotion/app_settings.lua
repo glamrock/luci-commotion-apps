@@ -14,9 +14,17 @@ expire = s:option(Flag, "allowpermanent", translate("Force local applications to
 expire.enabled = "0"
 expire.disabled = "1"
 expire.default = expire.disabled
-expire.remove=ccbi.flag_off
 expire.write=ccbi.flag_write
 expire.optional = false
+
+function expire.remove(self, section, fvalue)
+   value = self.map:get(section, self.option)
+   if value ~= fvalue then
+	  self.section.changed = true
+	  return self.map:set(section, self.option, fvalue)
+   end
+end
+
 
 ex_time_num = s:option(Value, "lifetime", translate("Time before applications expire"))
 ex_time_num:depends("allowpermanent","0")
