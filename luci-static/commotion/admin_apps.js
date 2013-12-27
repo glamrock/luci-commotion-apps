@@ -26,6 +26,14 @@ function JudgeApp(app,approved) {
                                         }
                                 }
         		}
+				else{
+					var elems = document.getElementsByTagName('*');
+                    for (var i in elems) {
+                        if((' ' + elems[i].className + ' ').indexOf(' ' + app + ' ') > -1) {
+                            $(elems[i].remove())
+                        }
+                    }
+				}
         	}
         );
 	return false;

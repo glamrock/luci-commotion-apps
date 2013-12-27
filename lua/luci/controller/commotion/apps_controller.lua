@@ -83,12 +83,14 @@ function judge_app()
 	  end
    else
 	  removed = uci:delete("applications", app_id)
+	  uci:save('applications') 
+	  uci:commit('applications'))
 	  if removed then
 		 luci.http.status(200, "OK")
 	  else
 		 dispatch.error500("Could not judge app")
 	  end
-   end
+	  end
 end
 
 function action_edit()
