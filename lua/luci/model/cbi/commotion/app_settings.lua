@@ -5,7 +5,6 @@ local ccbi = require "luci.commotion.ccbi"
 local m = Map("applications", translate("Application Settings"), translate("Change settings for applications publicly announced by this node."))
 m.on_after_save = ccbi.conf_page
 
-
 s = m:section(TypedSection, "settings", translate("Categories"))
 
 categories = s:option(DynamicList, "category")
@@ -27,8 +26,6 @@ end
 
 
 ex_time_num = s:option(Value, "lifetime", translate("Time before applications expire"))
-ex_time_num:depends("allowpermanent","0")
-ex_time_num.forcewrite = true --This is required for a modification of the unit to cause a change in the number.
 
 --! ex_time_num.write
 --! @brief Multiple the lifetime by the unit chosen to modify it to seconds.
@@ -41,7 +38,6 @@ function ex_time_num.write(self, section, value)
 	  if unit == unt then
 		 value = tonumber(value) * num
 		 sets = true
-		 db.log("3")
 	  end
    end
    if sets then
@@ -58,7 +54,7 @@ ex_time_units:value("seconds")
 ex_time_units:value("minutes")
 ex_time_units:value("hours")
 ex_time_units:value("days")
-ex_time_units:depends("allowpermanent","0")
+
 function ex_time_units.write() return true end
 
 apprv = s:option(Flag, "autoapprove", translate("Automatically approve all publicly announced applications on this network"))
