@@ -503,7 +503,7 @@ ${app_types}
 		 description = values.description,
 		 ttl = values.ttl,
 		 app_types = app_types,
-		 lifetime = lifetime
+		 lifetime = values.lifetime == '0' and '0' or lifetime
 	  }
 	  
 	  -- Create Serval identity keypair for service, then sign service advertisement with it
