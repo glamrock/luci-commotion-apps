@@ -106,8 +106,8 @@ function load_apps(admin_vars)
 					 end
 				  else
 					 if app.type and app.approved and app.approved == '1' then
-						if not categories.misc then categories.misc = {} end
-						categories.misc[app.uuid] = app
+						if not categories.applications then categories.applications = {} end
+						categories.applications[app.uuid] = app
 					 end
 				  end
    end)
