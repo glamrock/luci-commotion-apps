@@ -82,11 +82,17 @@ function judge_app()
 		 dispatch.error500("Could not judge app")
 	  end
    else
-	  removed = uci:delete("applications", app_id)
+	  uci_removed = uci:delete("applications", app_id)
 	  uci:save('applications') 
 	  uci:commit('applications')
-	  if removed then
-		 luci.http.status(200, "OK")
+	  if uci_removed then
+	         if luci.fs.isfile("/etc/avahi/services/" .. app_id .. ".service") then
+	              if (luci.fs.unlink("/etc/avahi/services/" .. app_id .. ".service") ~= 0) then
+		           dispatch.error500("Failed to delete Avahi service file")
+			   return
+	              end
+	         end
+	         luci.http.status(200, "OK")
 	  else
 		 dispatch.error500("Could not judge app")
 	  end
