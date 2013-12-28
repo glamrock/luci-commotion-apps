@@ -9,7 +9,7 @@ s = m:section(TypedSection, "settings", translate("Categories"))
 
 categories = s:option(DynamicList, "category")
 categories.optional = false
-expire = s:option(Flag, "allowpermanent", translate("Force local applications to expire? Yes/No"), translate("By default, all applications expire after a time period you specify. Un-check this box if applications should not expire."))
+expire = s:option(Flag, "allowpermanent", translate("Force local applications to expire?"), translate("When checked, all applications expire after a time period you specify. Un-check this box if applications should not expire."))
 expire.enabled = "0"
 expire.disabled = "1"
 expire.default = expire.disabled
