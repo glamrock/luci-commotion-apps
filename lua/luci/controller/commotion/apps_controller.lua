@@ -333,6 +333,9 @@ function action_add(edit_app)
 	  else
 		 url_port = values.uri:match(":[0-9]+")
 		 url_port = url_port and url_port:gsub(":","") or ''
+		 if url_port == '' then
+			url_port = values.uri:match("^https://") and "443" or ''
+		 end
 	  end
 	  local curr_port = "80"
 	  if url_port and url_port ~= "" then
