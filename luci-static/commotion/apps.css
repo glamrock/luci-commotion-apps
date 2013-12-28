@@ -1,5 +1,4 @@
 .apps {
-border:2px dashed #ff6699;
 margin-top:8px;
 }
 
@@ -28,6 +27,14 @@ width:100%;
 margin:10px 0;
 }
 
+h2.appsH2 {
+text-align:left;
+margin:0 0;
+}
+.apps-content {
+text-align:left;
+}
+
 a, a:focus { outline: 0; }
 
 .notice {
@@ -51,7 +58,7 @@ text-align:right;
 }
 
 .name h4 { display:inline-block; color:#000000; }
-.app-tooltip { 
+.app-tooltip {
 	display:none; 
 	background:#ffffff; 
 	border: 1px #DDDDDD solid;
@@ -152,10 +159,11 @@ input#appfaded {
 .signature, .colorprint { font-family: "Courier New"; font-weight:bold; font-size: 14px; }
 
 button.approve { background: url("check.png") no-repeat left center; }
-button.blacklist {background: url("x.png") no-repeat left center; }
+button.banned {background: url("bann.png") no-repeat left center; }
 a.edit {background: url("equals.png") no-repeat left center; padding:10px 0 10px 40px;}
+button.delete { background: url("x.png") no-repeat left center; }
 
-button.approve, button.blacklist, a.edit {
+button.approve, button.delete, button.banned, a.edit {
 color:#FF6699;
 font-weight:bold;
 height:36px;
@@ -177,5 +185,13 @@ fieldset legend { padding-top:0; }
   height: 100%;
   top: 5px;
   right: 5px;
+}
+
+.app-type {
+	text-align:right;
+	margin-right:95px;
+	color:#FF6699;
+	font-size:13px;
+	font-style:italic;
 }
 
