@@ -17,9 +17,9 @@
 <div class="apps-content">
 <h2><a id="content" name="content">
   <% if page.type == "add" then %>
-    Add an Application
+    <%:Add an Application%>
   <% else %>
-    Edit <%=app.name%>
+    <%:Edit%> <%=app.name%>
   <% end %>
 </a></h2>
 <% if err and err.notice ~= "" then %><div class="notice"><%=err.notice%></div><% end %>
@@ -39,7 +39,7 @@
       <div class="cbi-value-field">
   	<input type="text" maxlength="254" name="name" <% if app then %>value="<%=app.name%>"<% end %>/>
   	<%if err and err.name then%><div class="error"><%=err.name%></div><%end%>
-  	<div class="cbi-value-description"><%:This is how your application will be known and displayed%>.</div>
+  	<div class="cbi-value-description"><%:This is how your application will be displayed%>.</div>
       </div>
     </div>
     <div class="cbi-value">
@@ -99,8 +99,8 @@
 	<div class="cbi-value-field">
           <select size="1" name="approved" class="cbi-input-select">
           <option value=""></option>
-          <option value="1"<% if (app.approved == "1") then %> selected<% end %>>approved</option>
-          <option value="0"<% if (app.approved == "0") then %> selected<% end %>>blacklisted</option>
+          <option value="1"<% if (app.approved == "1") then %> selected<% end %>><%:approved%></option>
+          <option value="0"<% if (app.approved == "0") then %> selected<% end %>><%:blacklisted%></option>
           </select>
           <div class="cbi-value-description"><%:Approved applications are shown to users, while blacklisted applications are not. All applications are approved automatically%>.</div>
         </div>
