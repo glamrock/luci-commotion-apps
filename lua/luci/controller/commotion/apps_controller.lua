@@ -106,6 +106,7 @@ end
 function load_apps(admin_vars)
    local uuid, app
    local uci = require "luci.model.uci".cursor()
+   local autoapprove = uci:get("applications","settings","autoapprove")
    local categories = {}
    if admin_vars then
 	  categories = {banned={}, approved={}, new={}}
@@ -122,7 +123,7 @@ function load_apps(admin_vars)
 						categories.new[app.uuid] = app
 					 end
 				  else
-					 if app.approved and app.approved == '1' then
+					 if autoapprove == '1' or (app.approved and app.approved == '1') then
 						if not categories.applications then categories.applications = {} end
 						categories.applications[app.uuid] = app
 					 end
