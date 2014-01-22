@@ -449,7 +449,7 @@ ${app_types}
 <!-- Reference: http://wiki.xbmc.org/index.php?title=Avahi_Zeroconf -->
 
 <service-group>
-<name replace-wildcards="yes">${uuid} on %h</name>
+<name replace-wildcards="yes">${hash}</name>
 
 <service>
 ]] .. signing_tmpl .. [[
@@ -498,7 +498,6 @@ ${app_types}
 	  end
 	  
 	  local fields = {
-		 uuid = UUID,
 		 name = values.name,
 		 type = service_type,
 		 uri = values.uri,
@@ -507,7 +506,8 @@ ${app_types}
 		 description = values.description,
 		 ttl = values.ttl,
 		 app_types = app_types,
-		 lifetime = values.lifetime == '0' and '0' or lifetime
+		 lifetime = values.lifetime == '0' and '0' or lifetime,
+		 hash = luci.sys.exec("echo \"" .. cutil.pass_to_shell(UUID) .. luci.sys.hostname() .. "\" |sha1sum"):match('^[a-fA-F0-9]+')
 	  }
 	  
 	  -- Create Serval identity keypair for service, then sign service advertisement with it
