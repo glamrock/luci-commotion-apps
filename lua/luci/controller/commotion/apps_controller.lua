@@ -257,8 +257,20 @@ function action_add(edit_app)
 	  end
    end
    
-   if not validate.uri(values.uri) then 
-	 error_info.uri = "Invalid URL"
+   if not validate.app_name(values.name) then
+	   error_info.name = "Invalid name; must be between 1 and 250 characters"
+   end
+   
+   if not validate.app_description(values.description) then
+	   error_info.description = "Invalid description; must be between 1 and 243 characters"
+   end
+   
+   if not validate.app_uri(values.uri) then 
+	 error_info.uri = "Invalid URI; must be valid IP address or URI less than 252 characters"
+   end
+   
+   if not validate.app_icon(values.icon) then 
+	 error_info.icon = "Invalid icon; must be valid URL or file path less than 251 characters"
    end
    
    if (values.port ~= '' and not dt.port(values.port)) then

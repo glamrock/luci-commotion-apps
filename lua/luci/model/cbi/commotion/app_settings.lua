@@ -1,6 +1,7 @@
 local ccbi = require "luci.commotion.ccbi"
 local db = require "luci.commotion.debugger"
 local ccbi = require "luci.commotion.ccbi"
+local validate = require "luci.commotion.validate"
 
 local m = Map("applications", translate("Application Settings"), translate("Change settings for applications publicly announced by this node."))
 m.on_after_save = ccbi.conf_page
@@ -9,6 +10,14 @@ s = m:section(TypedSection, "settings", translate("Categories"))
 
 categories = s:option(DynamicList, "category")
 categories.optional = false
+function categories:validate(self, value)
+	if validate.app_settings_category(value) then
+		return value
+	else
+		return nil, "Categories must be less than 251 characters"
+	end
+end
+
 expire = s:option(Flag, "allowpermanent", translate("Force local applications to expire?"), translate("When checked, all applications expire after a time period you specify. Un-check this box if applications should not expire."))
 expire.enabled = "0"
 expire.disabled = "1"
@@ -33,14 +42,13 @@ function ex_time_num.write(self, section, value)
    local units = {seconds=1, minutes=60, hours=3600, days=86400}
    local unit = ex_time_units:formvalue(section)
    local sets = nil
-
+   
    for unt,num in pairs(units) do
 	  if unit == unt then
 		 value = tonumber(value) * num
-		 sets = true
 	  end
    end
-   if sets then
+   if sets and value > 0 then
 	  return self.map:set(section, self.option, value)
    else
 	  return nil
