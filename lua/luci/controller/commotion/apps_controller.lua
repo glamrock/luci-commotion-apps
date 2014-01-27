@@ -22,6 +22,8 @@ require "luci.http"
 require "luci.sys"
 require "luci.fs"
 local db  = require "luci.commotion.debugger"
+local validate = require "luci.commotion.validate"
+local dt = require "luci.cbi.datatypes"
 
 function index()
   local uci = luci.model.uci.cursor()
@@ -255,18 +257,15 @@ function action_add(edit_app)
 	  end
    end
    
-   if not id.is_ip4addr(values.uri) then 
-	  local url = uri:new(encode.url(values.uri))
-	  if (not url or (url:scheme() ~= "http" and url:scheme() ~= "https")) then
-		 error_info.uri = "Invalid URL"
-	  end
+   if not validate.uri(values.uri) then 
+	 error_info.uri = "Invalid URL"
    end
    
-   if (values.port ~= '' and not id.is_port(values.port)) then
+   if (values.port ~= '' and not dt.port(values.port)) then
 	  error_info.port = "Invalid port number; must be between 1 and 65535"
    end
    
-   if (values.ttl ~= '' and not id.is_uint(values.ttl)) then
+   if (values.ttl ~= '' and not validate.ttl(values.ttl)) then
 	  error_info.ttl = "Invalid TTL value; must be integer greater than zero"
    end
    
@@ -283,7 +282,7 @@ function action_add(edit_app)
 	  return
    end
    
-   if (luci.http.formvalue("uuid") and not id.is_valid_uci(luci.http.formvalue("uuid"))) then
+   if (luci.http.formvalue("uuid") and not dt.uciname(luci.http.formvalue("uuid"))) then
 	  DIE("Invalid UUID value")
 	  return
    end
@@ -302,26 +301,16 @@ function action_add(edit_app)
    
    -- make sure application types are within the set of approved categories on node
    if (luci.http.formvalue("type")) then
-	  app_types = uci:get_list("applications","settings","category")
-	  if (type(luci.http.formvalue("type")) == "table") then
-		 for i, type in pairs(luci.http.formvalue("type")) do
-			if (not luci_util.contains(app_types, type)) then
-			   dispatch.error500("Invalid application type value")
-			   return
-			end
-		 end
-	  else
-		 if (not luci_util.contains(app_types, luci.http.formvalue("type"))) then
-			dispatch.error500("Invalid application type value")
-			return
-		 end
-	  end
-	  values.type = luci.http.formvalue("type")
+	   if (not validate.app_category(luci.http.formvalue("type"))) then
+		   dispatch.error500("Invalid application type value")
+		   return
+	   end
+	   values.type = luci.http.formvalue("type")
    end
    
    -- Check service for connectivity, if requested
    if (checkconnect == "1") then
-	  if (values.uri ~= '' and not id.is_ip4addr(values.uri)) then
+	  if (values.uri ~= '' and not dt.ip4addr(values.uri)) then
 		 url = string.gsub(values.uri, '[a-z]+://', '', 1)
 		 url = url:match("^[^/:]+") -- remove anything after the domain name/IP address
 		 -- url = url:match("[%a%d-]+\.%w+$") -- remove subdomains (** actually we should probably keep subdomains **)
@@ -513,7 +502,7 @@ ${app_types}
 	  -- Create Serval identity keypair for service, then sign service advertisement with it
 	  signing_msg = cutil.tprintf(signing_tmpl,fields)
 	  fields.fingerprint = luci.sys.exec("serval-client id self"):match('^[A-F0-9]+')
-	  if (luci.http.formvalue("fingerprint") and id.is_hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
+	  if (luci.http.formvalue("fingerprint") and validate.hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
 		 resp = luci.sys.exec("commotion serval-crypto sign " .. luci.http.formvalue("fingerprint") .. " \"" .. cutil.pass_to_shell(signing_msg) .. "\"")
 	  else
 		 if (not deleted_uci and edit_app and not uci:delete("applications",UUID)) then
