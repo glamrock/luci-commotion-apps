@@ -10,7 +10,7 @@ s = m:section(TypedSection, "settings", translate("Categories"))
 
 categories = s:option(DynamicList, "category")
 categories.optional = false
-function categories:validate(self, value)
+function categories.validate(self, value)
 	if validate.app_settings_category(value) then
 		return value
 	else
