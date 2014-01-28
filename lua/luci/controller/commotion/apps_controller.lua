@@ -225,7 +225,6 @@ function action_add(edit_app)
    local dispatch = require "luci.dispatcher"
    local encode = require "luci.commotion.encode"
    local cutil = require "luci.commotion.util"
-   local id = require "luci.commotion.identify"
    local luci_util = require "luci.util"
    local bad_data = {}
    local error_info = {}
