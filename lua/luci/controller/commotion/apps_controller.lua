@@ -320,7 +320,7 @@ function action_add(edit_app)
    end
    
    -- Check service for connectivity, if requested
-   if (checkconnect == "1") then
+   if (checkconnect == "1" and not error_info.uri) then
 	  if (values.uri ~= '' and not dt.ip4addr(values.uri)) then
 		 url = string.gsub(values.uri, '[a-z]+://', '', 1)
 		 url = url:match("^[^/:]+") -- remove anything after the domain name/IP address
