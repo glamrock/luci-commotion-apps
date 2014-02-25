@@ -527,7 +527,7 @@ ${app_types}
 		 return
 	  end
 	  
-	  _,_,fields.signature = resp:find('([A-F0-9]+)')
+	  _,_,fields.signature = resp:find('"signature": "([A-Z0-9]+)"')
 	  -- UUID = fields.fingerprint  -- not for single-key node
 	  values.fingerprint = fields.fingerprint
 	  values.signature = fields.signature
