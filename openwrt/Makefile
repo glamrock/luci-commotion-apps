@@ -25,7 +25,7 @@ define Package/$(PKG_NAME)
   CATEGORY:=Commotion
   SUBMENU:=User Interface
   DEPENDS:=+commotion-lua +luci-mod-commotion +luci-theme-commotion +netcat \
-+commotiond +avahi-daemon +lua-helpers-identify +lua-helpers-encode \
++commotiond +avahi-daemon +lua-helpers-validate +lua-helpers-encode \
 +lua-helpers-util +commotion-service-manager
   TITLE:=Commotion Application Portal
   URL:=https://commotionwireless.net
@@ -46,6 +46,15 @@ define Package/$(PKG_NAME)/install
 	$(CP) $(PKG_BUILD_DIR)/luci-static/$(THEME_NAME)/* $(1)/www/luci-static/$(THEME_NAME)/ || true
 	$(INSTALL_DIR) $(1)/usr/lib/lua
 	$(CP) $(PKG_BUILD_DIR)/lua/* $(1)/usr/lib/lua/ || true
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/uci-defaults/* $(1)/etc/uci-defaults/
+endef
+
+define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] || {
+        ( . /etc/uci-defaults/$(PKG_NAME) ) && rm -f /etc/uci-defaults/$(PKG_NAME)
+}
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
