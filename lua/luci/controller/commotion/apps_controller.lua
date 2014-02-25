@@ -233,6 +233,7 @@ function action_add(edit_app)
    local autoapprove = uci:get("applications","settings","autoapprove")
    local checkconnect = uci:get("applications","settings","checkconnect")
    local uri = require "uri"
+   local node_key = luci.sys.exec("serval-client id self"):match('^[A-F0-9]+')
    
    values = {
 	  name =  luci.http.formvalue("name"),
@@ -363,7 +364,7 @@ function action_add(edit_app)
 	  if (count and count ~= '' and tonumber(count) >= 100) then
 		 error_info.notice = "This node cannot support any more applications at this time. Please contact the node administrator or try again later."
 	  else
-		 UUID = encode.uci(values.uri .. values.port):sub(1,254)
+		 UUID = encode.uci(values.uri .. values.port .. node_key)
 		 values.uuid = UUID
 		 
 		 uci:foreach("applications", "application", 
@@ -407,20 +408,17 @@ function action_add(edit_app)
    
    -- Update application if UUID has changed
    if (luci.http.formvalue("uuid") and edit_app) then 
-	  if (luci.http.formvalue("uuid") ~= encode.uci(values.uri .. values.port)) then
+	  if (luci.http.formvalue("uuid") ~= encode.uci(values.uri .. values.port .. node_key)) then
 		 if (not uci:delete("applications",luci.http.formvalue("uuid"))) then
 			dispatch.error500("Unable to remove old UCI entry")
 			return
 		 end
 		 deleted_uci = 1
-		 UUID = encode.uci(values.uri .. values.port):sub(1,254)
+		 UUID = encode.uci(values.uri .. values.port .. node_key)
 		 values.uuid = UUID
 	  else
 		 UUID = luci.http.formvalue("uuid")
 		 values.uuid = UUID
-		 if UUID:len() > 254 then
-			DIE("Invalid UUID length")
-		 end
 	  end
    end
    
@@ -506,13 +504,13 @@ ${app_types}
 		 description = values.description,
 		 ttl = values.ttl,
 		 app_types = app_types,
+		 fingerprint = node_key,
 		 lifetime = values.lifetime == '0' and '0' or lifetime,
-		 hash = luci.sys.exec("echo \"" .. cutil.pass_to_shell(UUID) .. luci.sys.hostname() .. "\" |sha1sum"):match('^[a-fA-F0-9]+')
+		 hash = luci.sys.exec("echo \"" .. cutil.pass_to_shell(UUID) .. "\" |sha1sum"):match('^[a-fA-F0-9]+')
 	  }
 	  
 	  -- Create Serval identity keypair for service, then sign service advertisement with it
 	  signing_msg = cutil.tprintf(signing_tmpl,fields)
-	  fields.fingerprint = luci.sys.exec("serval-client id self"):match('^[A-F0-9]+')
 	  if (luci.http.formvalue("fingerprint") and validate.hex(luci.http.formvalue("fingerprint")) and luci.http.formvalue("fingerprint"):len() == 64 and edit_app) then
 		 resp = luci.sys.exec("commotion serval-crypto sign " .. luci.http.formvalue("fingerprint") .. " \"" .. cutil.pass_to_shell(signing_msg) .. "\"")
 	  else
