@@ -3,7 +3,9 @@ Commotion-apps
 
 Commotion-apps contains a LuCI application portal for OpenWRT, as well as a script to check for new applications nearby on the network.
 
-The LuCI application portal adds some pages to the Commotion OpenWRT menu. The main page shows all local applications on the mesh that have been approved by the node administrator. There are also pages for creating an application, as well as administrator pages for approving/blacklisting apps and changing settings related to applications.
+The LuCI application portal adds some pages to the Commotion-Router menu. The main page shows all local applications on the mesh that have been approved by the node administrator. There are also pages for creating an application, as well as administrator pages for approving/blacklisting apps and changing settings related to applications.
+
+Commotion-apps is selected as a default build option in Commotion-Router (https://github.com/opentechinstitute/commotion-router).
 
 Advertising applications
 ------------------------
