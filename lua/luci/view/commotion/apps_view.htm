@@ -6,9 +6,15 @@
 <h2 class="appsH2"><a id="content" name="content"><%:Applications%></a></h2>
 <% if admin_vars then %>
 <script type="text/javascript" src="<%=media%>/admin_apps.js"></script>
-<%:Publicly announced applications running on this network are listed below.%>
+<p><%:Publicly announced applications running on this network are listed below.%></p>
 <%else%>
-<%:Here you can view applications accessible from this node%>.
+<p><%:Here you can view applications accessible from this node%>.</p>
+<% end %>
+<% 
+require "luci.http"
+if luci.http.formvalue("add") and luci.http.formvalue("add") == "success" then
+%>
+<div class="notice notice-success">Application added successfully!<% if not admin_vars then %> The node administrator may need to approve the application before it shows up on this list.<% end %></div>
 <% end %>
 </div>
 <div class="cbi-map">
