@@ -38,11 +38,19 @@ text-align:left;
 a, a:focus { outline: 0; }
 
 .notice {
-background:#ffbdd3;
-border:2px solid #FF6699;
 border-radius:5px;
 padding:5px;
 margin:5px 0;
+}
+
+.notice-error {
+background:#ffbdd3;
+border:2px solid #FF6699;
+}
+
+.notice-success {
+border:2px solid #00FF00;
+background:#CCFFCC;
 }
 
 .error {

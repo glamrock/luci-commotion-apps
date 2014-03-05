@@ -125,7 +125,7 @@ function load_apps(admin_vars)
 						categories.new[app.uuid] = app
 					 end
 				  else
-					 if autoapprove == '1' or (app.approved and app.approved == '1') then
+					 if (app.approved and app.approved == '1') or (autoapprove == '1' and not app.approved) then
 						if not categories.applications then categories.applications = {} end
 						categories.applications[app.uuid] = app
 					 end
@@ -578,8 +578,8 @@ ${app_types}
    uci:commit('applications')
    
    if (edit_app) then
-	  luci.http.redirect("../apps")
+	  luci.http.redirect("../apps?add=success")
    else
-	  luci.http.redirect("/cgi-bin/luci/apps")
+	  luci.http.redirect("/cgi-bin/luci/apps?add=success")
    end   
 end -- action_add()

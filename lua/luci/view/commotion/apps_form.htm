@@ -22,7 +22,7 @@
     <%:Edit%> <%=app.name%>
   <% end %>
 </a></h2>
-<% if err and err.notice ~= "" then %><div class="notice"><%=err.notice%></div><% end %>
+<% if err and err.notice ~= "" then %><div class="notice notice-error"><%=err.notice%></div><% end %>
 
 <%
    if string.match(REQUEST_URI, "/admin/") then
