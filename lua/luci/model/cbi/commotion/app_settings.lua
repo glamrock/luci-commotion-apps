@@ -46,6 +46,7 @@ function ex_time_num.write(self, section, value)
    for unt,num in pairs(units) do
 	  if unit == unt then
 		 value = tonumber(value) * num
+		 sets = true
 	  end
    end
    if sets and value > 0 then
