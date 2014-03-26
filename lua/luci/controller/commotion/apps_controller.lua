@@ -543,6 +543,7 @@ ${app_types}
 		 service_file:write(service_string)
 		 service_file:flush()
 		 service_file:close()
+		 luci.sys.exec("kill -s USR1 $(pgrep olsrd)"); -- send signal to olsrd-dnssd to reload services
 		 luci.sys.exec("/etc/init.d/avahi-daemon restart")
 	  else
 		 dispatch.error500("Failed to create avahi service file")
@@ -561,6 +562,7 @@ ${app_types}
 			return
 		 end
 		 luci.sys.exec("/etc/init.d/avahi-daemon restart")
+		 luci.sys.exec("sleep 5; kill -s USR1 $(pgrep olsrd)"); -- send signal to olsrd-dnssd to reload services
    end
    
    -- Commit everthing to UCI
